@@ -21,8 +21,10 @@ function viewProduto(idproduto) {
     
     sql = `SELECT * FROM AD_ECMPRODUTOS WHERE IDPRODUTO = ${idproduto}`;
     let produto = getDadosSql(sql,true);
+    console.log(idproduto)
     sql = `SELECT * FROM TGFPRO WHERE CODPROD = ${produto[0].PRODUTOIDSK}`;
     let produtosk = getDadosSql(sql,true);
+
     sql = `SELECT * FROM TGFGRU WHERE CODGRUPOPROD = ${produtosk[0].CODGRUPOPROD}`;
     let grupoprod = getDadosSql(sql,true);
     sql = `SELECT * FROM AD_ECMCATEGORIAS ae RIGHT JOIN AD_ECMPRODUTOS ae2 ON ae2.CATEGORYID = ae.IDCATEGORIA WHERE ae2.IDPRODUTO = ${idproduto}`;
@@ -152,7 +154,7 @@ function viewProduto(idproduto) {
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label" for="garantia">Descrição da Garantia</label>
-                                                <input type="text" class="form-control form-control-sm" name="garantia" id="garantia" value="">
+                                                <input type="text" class="form-control form-control-sm" name="garantia" id="garantia" value="" disabled>
                                             </div>
                                         </div>
                                         <div class="row mt-3">
@@ -243,6 +245,10 @@ function viewProduto(idproduto) {
                                                 <label class="form-label" for="visivelAte">Visivel Até </label>
                                                 <input type="datetime-local" class="form-control mt-2 form-control-sm" name="visivelAte" id="visivelAte" value="">
                                             </div>
+                                            <div class="col-2">
+                                                <label class="form-label" for="registroOcp">Registro OCP</label>
+                                                <input type="text" class="form-control mt-2 form-control-sm" name="registroOcp" id="registroOcp" value="" disabled>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tab-pane container fade" id="produtos">
@@ -308,7 +314,6 @@ function viewProduto(idproduto) {
     $("#codigoEcm").val(produto[0].PRODUCTID);
     $("#descErp").val(produtosk[0].DESCRPROD);
     $("#descEcommerce").val(produto[0].NOMEPROD);
-    console.log(produto[0].NAME)
     $("#categoriaErp").val(grupoprod[0].CODGRUPOPROD +' - '+ grupoprod[0].DESCRGRUPOPROD);
     $("#categoriaEcm").val(produto[0].CATEGORYID);
     $("#tituloPagina").val(produto[0].NOMEPROD);
@@ -316,12 +321,23 @@ function viewProduto(idproduto) {
     $("#descricaoCurta").val(produto[0].SHORTDESCRIPTION);
     $("#metaDescricao").val(produto[0].METADESCRIPTION);
     editor.setValue(produto[0].LONGDESCRIPTION);
-    if(produto[0].METAKEYWORDS==="" || produto[0].METAKEYWORDS===null){
-        $("#palavrasChave").val(categoriaProdutos[0].KEYWORDS)
-    }else{
-        $('#palavrasChave').val(produto[0].METAKEYWORDS);
+    
+    let palavrasChaves = "";
+    let palavrasChavesCategorias = verificaPalavraChavePai(categoriaProdutos[0].IDCATEGORIA)
+    console.log(palavrasChavesCategorias)
+    let palavrasChavesProduto = produto[0].METAKEYWORDS 
+    if(palavrasChavesProduto){
+        palavrasChaves += (palavrasChavesProduto+",")
+        console.log(palavrasChaves)
     }
-    $("#garantia").val(produto[0].WARRANTYDESCRIPTION);
+    if(palavrasChavesCategorias){
+        palavrasChaves += (palavrasChavesCategorias+",")
+        console.log(palavrasChaves)
+    }
+    let palavrasChavesSemRepeticao = verificaSeHaPalavrasChavesIguais(palavrasChaves)
+
+    $("#palavrasChave").val(palavrasChavesSemRepeticao)
+    $("#garantia").val(produto[0].WARRANTYDESCRIPTION == "" || produto[0].WARRANTYDESCRIPTION == null ? produtosk[0].AD_GARANTIAMESES + " meses" : produto[0].WARRANTYDESCRIPTION );
     $("#exibeDisponibilidade").val(produto[0].DISPLAYAVAILABILITY);
     $("#exibePreco").val(produto[0].DISPLAYPRICE);
     $("#produtoNovo").val(produto[0].ISNEW);
@@ -333,6 +349,7 @@ function viewProduto(idproduto) {
     $("#usuarioTermos").val(produto[0].USEACCEPTANCETERM);
     $("#visivel").val(produto[0].ISVISIBLE);
     $("#exibeEstoque").val(produto[0].DISPLAYSTOCKQTY);
+    $("#registroOcp").val(produtosk[0].AD_OCP);
     montaTabelaSkuEcm(produto[0].IDPRODUTO);
     montaTabelaSkuNImp(produto[0].SKU, produto[0].IDPRODUTO);
     buscaMetaDado(produto[0].IDPRODUTO,produto[0].CATEGORYID);
@@ -340,10 +357,54 @@ function viewProduto(idproduto) {
 
 }
 
+function verificaSeHaPalavrasChavesIguais(str){
+    let arraysconcat = str.split(",")
+    const arraySemRepeticoes = arraysconcat.filter((array, index, self) => {
+        return (
+            index === self.findIndex((arr) => JSON.stringify(arr) === JSON.stringify(array))
+        );
+    });
+    console.log(arraySemRepeticoes)
+    return arraySemRepeticoes
+}
 
+function sqlRetornaPalavraChave(idPai){
+    let sql = `SELECT KEYWORDS, IDCATEGORIAPAI,NIVEL  FROM AD_ECMCATEGORIAS WHERE IDCATEGORIA = ${idPai}`
+    let dados = getDadosSql(sql)
+    return dados
+}
+
+function verificaPalavraChavePai(idCategoria) {
+    let palavrasChaves = []
+    let dados = sqlRetornaPalavraChave(idCategoria)
+    // console.log(dados[0][0])s
+    console.log(dados.length)
+    if(dados.length > 0) {
+        palavrasChaves.push(dados[0][0])
+        if(dados[0][2] == 3) {
+            let dadosNivel2 = sqlRetornaPalavraChave(dados[0][1])
+            dadosNivel2[0][0] ? palavrasChaves.push(dados[0][0]) : ""
+            let dadosNivel1 = sqlRetornaPalavraChave(dadosNivel2[0][1])
+            dadosNivel1[0][0] ? palavrasChaves.push(dados[0][0]) : ""
+            console.log("Sou nivel 3")
+            console.log(palavrasChaves)
+        }
+        else if(dados[0][2] == 2) {
+            let dadosNivel1 = sqlRetornaPalavraChave(dados[0][1])
+            dadosNivel1[0][0] ? palavrasChaves.push(dados[0][0]) : ""
+            console.log("Sou nivel 2")
+        }
+    }
+    let arraysconcat = ""
+    if(palavrasChaves.length > 0){
+        arraysconcat = palavrasChaves.join(",")
+        return arraysconcat
+    }
+}
 
 function buscaMetaDado(idProduto,idCategoria){
-    
+
+
     let selectMetaDados = `
     SELECT 
     emd.IDMETA,
@@ -357,7 +418,7 @@ function buscaMetaDado(idProduto,idCategoria){
     FROM AD_ECMMETADATA emd
     inner JOIN AD_ECMCATMETADATA ecmd ON ecmd.IDMETA =  emd.IDMETA 
     inner JOIN AD_ECMCATEGORIAS ec ON ec.IDCATEGORIA = ecmd.IDCATEGORIA 
-    WHERE ec.IDCATEGORIA = ${idCategoria}
+    WHERE ec.IDCATEGORIA IN (${idCategoria})
     AND ecmd.ATIVO = 'S'
     AND emd.INPUTTYPEID IS NOT NULL`;
     
@@ -368,19 +429,15 @@ function buscaMetaDado(idProduto,idCategoria){
         cards_meta += "Não há metadados definidos para essa categoria ou o tipo não foi definido"
     }
     else{
+    let categoriasPais = autorizaCategoriasPai(dados[0][6],dados[0][5]);
+    if(categoriasPais){
 
-    let categoriasFilhas = autorizaCategoriasFilhas(dados[0][6],dados[0][5]);
-    
-    if(categoriasFilhas!=="" || categoriasFilhas!==undefined || categoriasFilhas!==null){
-        
-        let arraysconcat = dados.concat(categoriasFilhas)
-        console.log(arraysconcat)
+        let arraysconcat = dados.concat(categoriasPais)
         const arraySemRepeticoes = arraysconcat.filter((array, index, self) => {
             return (
               index === self.findIndex((arr) => JSON.stringify(arr) === JSON.stringify(array))
             );
           });
-        console.log(arraySemRepeticoes)
 
         for(let i = 0; i < arraySemRepeticoes.length; i++){
             if(arraySemRepeticoes[i]===undefined){
@@ -401,25 +458,23 @@ function buscaMetaDado(idProduto,idCategoria){
                         <h6>${displayName}</h6>
                         <p style="font-size:12px">${nameCategoria}</p>
                         <p class="card-text">`;
+
                             if(inputTypeId==1){
                                 cards_meta+=htmlEcm(idmeta,idProduto);
-                            }
-                            else if(inputTypeId==3){
+                            }else if(inputTypeId==3){
                                 cards_meta+=multiEcm(idmeta,idProduto);
-                            }
-                            else if(inputTypeId==4){
+                            }else if(inputTypeId==4){
                                 cards_meta+=listaEcm(idmeta,idProduto);
-                            }
-                            else if(inputTypeId==7){
+                            }else if(inputTypeId==7){
                                 cards_meta+=numeroEcm(idmeta,idProduto);
-                            }
-                            else if(inputTypeId==9){
+                            }else if(inputTypeId==9){
                                 cards_meta+=logicoEcm(idmeta,idProduto);
                             }else if(inputTypeId==0){
                                 cards_meta+=textEcm(idmeta,idProduto);
                             }else{
                                 cards_meta+="";
                             }
+                            
                         cards_meta+=`</p>
                     </div>
                 </div>
@@ -428,67 +483,113 @@ function buscaMetaDado(idProduto,idCategoria){
     } 
 }
 $('#produtoMetaDado').append(cards_meta);
-}
-function autorizaCategoriasFilhas(conta, nivel){
-    let selectCategoriasFilhas = `
-    SELECT IDCATEGORIA, CONTA , NIVEL , NAME 
-    FROM AD_ECMCATEGORIAS
-    WHERE CONTA LIKE '${conta}%'
-    and nivel > ${nivel}`;    
-    let dados = getDadosSql(selectCategoriasFilhas);
-    if(dados==="" || dados === undefined){}
-    else{
-    let selectMetaDados= "";
-    let dadosRecebidos = []
-    for(let i = 0; i < dados.length; i++){
-        selectMetaDados = `
-        SELECT 
-        emd.IDMETA,
-        emd.PROPERTYNAME , 
-        emd.INPUTTYPEID, 
-        emd.DISPLAYNAME,
-        ec.NAME,
-        ec.NIVEL,
-        ec.CONTA,
-        ec.IDCATEGORIAPAI
-        FROM AD_ECMMETADATA emd
-        INNER JOIN AD_ECMCATMETADATA ecmd ON ecmd.IDMETA =  emd.IDMETA 
-        INNER JOIN AD_ECMCATEGORIAS ec ON ec.IDCATEGORIA = ecmd.IDCATEGORIA 
-        WHERE ec.IDCATEGORIA = ${dados[i][0]}
-        AND ecmd.ATIVO = 'S'
-        AND emd.INPUTTYPEID IS NOT NULL`;
 
-        let arraysDados =  getDadosSql(selectMetaDados);
-        dadosRecebidos.push(arraysDados);
+let sqlValores = `
+SELECT PMDT.VALOR, ECM.IDPRODUTO, PMDT.IDMETA,MDT.INPUTTYPEID 
+FROM AD_ECMPRODUTOMETADADOS PMDT 
+inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+WHERE ECM.IDPRODUTO = ${idProduto}
+`
+
+let dadosValores = getDadosSql(sqlValores,true)
+
+dadosValores.map((res) => {
+    let idmeta = res.IDMETA;
+    let valor = res.VALOR;
+    let idProduto = res.IDPRODUTO;
+    let inputTypeId = res.INPUTTYPEID;
+    if(inputTypeId == 1) {
+        $(`textarea[name="mid_${idmeta}_${idProduto}"]`).val(valor);
     }
-        for (let i = dadosRecebidos.length - 1; i >= 0; i--) {
-            if (Array.isArray(dadosRecebidos[i]) && dadosRecebidos[i].length === 0) {
-            dadosRecebidos.splice(i, 1);
+    else if(inputTypeId == 3) {
+        let valoresArray = valor.split(",");
+        for(let i = 0; i < valoresArray.length; i++) {
+            var checkbox = $(`input[name="mid_${idmeta}_${idProduto}"][value="${valoresArray[i]}"]`);
+            if(checkbox.length > 0){
+                checkbox[0].setAttribute("checked", "checked");
             }
         }
-        console.log(dadosRecebidos[0])
-        return dadosRecebidos[0];
-    }    
+    }
+    else if(inputTypeId == 4 ||  inputTypeId == 9){
+        $(`select[name="mid_${idmeta}_${idProduto}"]`).val(valor)
+    }
+    else if(inputTypeId == 7 || inputTypeId == 0) {
+        $(`input[name="mid_${idmeta}_${idProduto}"]`).val(valor);
+    }
+})
+
+
+           
+
+}
+function autorizaCategoriasPai(conta, nivel){
+    let selectCategoriasPai = `
+    SELECT IDCATEGORIA, CONTA , NIVEL , NAME 
+    FROM AD_ECMCATEGORIAS
+    WHERE CONTA LIKE '${conta.substring(0,1)}%'
+    and nivel < ${nivel}`; 
+    let dados = getDadosSql(selectCategoriasPai);
+    if(!dados){}
+    else{
+        let selectMetaDados= "";
+        let dadosRecebidos = []
+        
+        for(let i = 0; i < dados.length; i++){
+            selectMetaDados = `
+            SELECT 
+            emd.IDMETA,
+            emd.PROPERTYNAME , 
+            emd.INPUTTYPEID, 
+            emd.DISPLAYNAME,
+            ec.NAME,
+            ec.NIVEL,
+            ec.CONTA,
+            ec.IDCATEGORIAPAI
+            FROM AD_ECMMETADATA emd
+            INNER JOIN AD_ECMCATMETADATA ecmd ON ecmd.IDMETA =  emd.IDMETA 
+            INNER JOIN AD_ECMCATEGORIAS ec ON ec.IDCATEGORIA = ecmd.IDCATEGORIA 
+            WHERE ec.IDCATEGORIA = ${dados[i][0]}
+            AND ecmd.ATIVO = 'S'
+            AND emd.INPUTTYPEID IS NOT NULL`;
+
+            let arraysDados =  getDadosSql(selectMetaDados);
+            dadosRecebidos.push(arraysDados);
+        }
+            for (let i = dadosRecebidos.length - 1; i >= 0; i--) {
+                if (Array.isArray(dadosRecebidos[i]) && dadosRecebidos[i].length === 0) {
+                dadosRecebidos.splice(i, 1);
+                }
+            }
+            return dadosRecebidos[0];
+    }  
+    
 }
 
 function saveHtmlEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
+        let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+    `
 
-    let idPrdMeta = arrayDados[0][0];
-    let valor = $(`textarea[name=mid_${idmeta}]`).val();
+    let idMeta = getDadosSql(sql,true)
+
+    let idPrdMeta = null
+    if(idMeta.length>0){
+        idPrdMeta = idMeta[0].IDPRDMETA
+    }
+    let valor = $(`textarea[name="mid_${idmeta}_${idProduto}"]`).val();
 
     let fields = {};
     fields.IDPRODUTO = dataFormatSankhya(idProduto);
     fields.IDMETA = dataFormatSankhya(idmeta);
     fields.VALOR = dataFormatSankhya(valor);
-    if(idPrdMeta != "" && idPrdMeta != undefined) {
+    let key = {}
+    if(idPrdMeta) {
         key =   {
                     "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                     "IDPRODUTO" : dataFormatSankhya(idProduto)
@@ -499,16 +600,22 @@ function saveHtmlEcm(idmeta,idProduto){
     }
 }
 function saveCheckEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
-    let idPrdMeta = arrayDados[0][0];
-        let valor = $(`input[name=mid_${idmeta}]`);
+        let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+        `
+
+        let idMeta = getDadosSql(sql,true)
+
+        let idPrdMeta = null
+        if(idMeta.length>0){
+            idPrdMeta = idMeta[0].IDPRDMETA
+        }
+        let valor = $(`input[name="mid_${idmeta}_${idProduto}"]`);
         let checkboxValue = [];
         valor.each(function() {
             if ($(this).prop('checked')) {
@@ -520,7 +627,9 @@ function saveCheckEcm(idmeta,idProduto){
         fields.IDPRODUTO = dataFormatSankhya(idProduto);
         fields.IDMETA = dataFormatSankhya(idmeta);
         fields.VALOR = dataFormatSankhya(valuesString);
-        if(idPrdMeta != "" && idPrdMeta != undefined) {
+        let key = {}
+
+        if(idPrdMeta) {
             key =   {
                         "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                         "IDPRODUTO" : dataFormatSankhya(idProduto)
@@ -529,56 +638,77 @@ function saveCheckEcm(idmeta,idProduto){
         }else{
             saveRecord('AD_ECMPRODUTOMETADADOS',fields)
         }
+        console.log(fields,key)
 }
 
 function saveSelectEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
+        let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+    `
 
-    let idPrdMeta = arrayDados[0][0];
-    let valor = $(`select[name=mid_${idmeta}]`).val();
+    let idMeta = getDadosSql(sql,true)
 
+    let idPrdMeta = null
+    if(idMeta.length>0){
+        idPrdMeta = idMeta[0].IDPRDMETA
+    }
+
+    console.log(idPrdMeta)
+    let valor = $(`select[name="mid_${idmeta}_${idProduto}"]`).val();
+    console.log(valor)
     let fields = {};
     fields.IDPRODUTO = dataFormatSankhya(idProduto);
     fields.IDMETA = dataFormatSankhya(idmeta);
     fields.VALOR = dataFormatSankhya(valor);
-    if(idPrdMeta != "" && idPrdMeta != undefined) {
+    let key = {}
+    console.log(fields)
+    if(idPrdMeta) {        
+        console.log("Id produto Metadado: "+idPrdMeta)
         key =   {
                     "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                     "IDPRODUTO" : dataFormatSankhya(idProduto)
                 }
                 saveRecord('AD_ECMPRODUTOMETADADOS',fields,key);
-    }else{
+    }else{        
+        console.log("Salvando dados não criados")
         saveRecord('AD_ECMPRODUTOMETADADOS',fields)
     }
+    console.log(fields, key)
 }
 
 
 
 function saveNumberEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
+            let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+    `
 
-    let idPrdMeta = arrayDados[0][0];
-    let valor = $(`input[name="mid_${idmeta}"]`).val();
+    let idMeta = getDadosSql(sql,true)
+
+    let idPrdMeta = null
+    if(idMeta.length>0){
+        idPrdMeta = idMeta[0].IDPRDMETA
+    }
+
+    let valor = $(`input[name="mid_${idmeta}_${idProduto}"]`).val();
 
     let fields = {};
     fields.IDPRODUTO = dataFormatSankhya(idProduto);
     fields.IDMETA = dataFormatSankhya(idmeta);
     fields.VALOR = dataFormatSankhya(valor);
-    if(idPrdMeta != "" && idPrdMeta != undefined) {
+    let key = {}
+
+    if(idPrdMeta) {
         key =   {
                     "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                     "IDPRODUTO" : dataFormatSankhya(idProduto)
@@ -590,23 +720,32 @@ function saveNumberEcm(idmeta,idProduto){
 }
 
 function saveBoolEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
+            let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+    `
 
-    let idPrdMeta = arrayDados[0][0];
-    let valor = $(`select[name=mid_${idmeta}]`).val();
+    let idMeta = getDadosSql(sql,true)
+
+    let idPrdMeta = null
+    if(idMeta.length>0){
+        idPrdMeta = idMeta[0].IDPRDMETA
+    }
+    
+
+    let valor = $(`select[name="mid_${idmeta}_${idProduto}"]`).val();
 
     let fields = {};
     fields.IDPRODUTO = dataFormatSankhya(idProduto);
     fields.IDMETA = dataFormatSankhya(idmeta);
     fields.VALOR = dataFormatSankhya(valor);
-    if(idPrdMeta != "" && idPrdMeta != undefined) {
+    let key = {}
+
+    if(idPrdMeta) {
         key =   {
                     "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                     "IDPRODUTO" : dataFormatSankhya(idProduto)
@@ -617,23 +756,31 @@ function saveBoolEcm(idmeta,idProduto){
     }
 }
 function saveTextEcm(idmeta,idProduto){
-    let selectPrdMeta = `
-    SELECT PMDT.IDPRDMETA
-    FROM AD_ECMPRODUTOMETADADOS PMDT 
-    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-    WHERE PMDT.IDPRDMETA = ${idmeta}
-    `;
-    let arrayDados = getDadosSql(selectPrdMeta)
+            let sql = `
+        SELECT PMDT.IDPRDMETA
+        FROM AD_ECMPRODUTOMETADADOS PMDT 
+        inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+        inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+        WHERE PMDT.IDMETA = ${idmeta}
+        AND ECM.IDPRODUTO = ${idProduto}
+    `
 
-    let idPrdMeta = arrayDados[0][0];
-    let valor = $(`input[name=mid_${idmeta}]`).val();
+    let idMeta = getDadosSql(sql,true)
+
+    let idPrdMeta = null
+    if(idMeta.length>0){
+        idPrdMeta = idMeta[0].IDPRDMETA
+    }
+    
+    let valor = $(`input[name="mid_${idmeta}_${idProduto}"]`).val();
 
     let fields = {};
     fields.IDPRODUTO = dataFormatSankhya(idProduto);
     fields.IDMETA = dataFormatSankhya(idmeta);
     fields.VALOR = dataFormatSankhya(valor);
-    if(idPrdMeta != "" && idPrdMeta != undefined) {
+    let key = {}
+
+    if(idPrdMeta) {
         key =   {
                     "IDPRDMETA" : dataFormatSankhya(idPrdMeta),
                     "IDPRODUTO" : dataFormatSankhya(idProduto)
@@ -646,7 +793,7 @@ function saveTextEcm(idmeta,idProduto){
 
 
 function htmlEcm(idmeta,idProduto){
-    return `<textarea onfocusout="saveHtmlEcm(${idmeta},${idProduto});" name="mid_${idmeta}" placeholder="Digite texto em HTML"></textarea>`
+    return `<textarea onfocusout="saveHtmlEcm(${idmeta},${idProduto});" name="mid_${idmeta}_${idProduto}" placeholder="Digite texto em HTML"></textarea>`
 }
 
 function multiEcm(idmeta,idProduto){
@@ -658,7 +805,7 @@ function multiEcm(idmeta,idProduto){
         itensCheckbox += 
         `
         <div class="form-check">
-            <input class="form-check-input" value="${arrayDoId[i][3]}" name="mid_${idmeta}" onfocusout="saveCheckEcm(${idmeta},${idProduto});" type="checkbox">
+            <input class="form-check-input" value="${arrayDoId[i][3]}" name="mid_${idmeta}_${idProduto}" onfocusout="saveCheckEcm(${idmeta},${idProduto});" type="checkbox">
             <label class="form-check-label" for="flexCheckDefault">
                 ${arrayDoId[i][3]}
             </label>
@@ -677,7 +824,7 @@ function listaEcm(idmeta,idProduto){
     if(arrayDoId.length < 1){
         selectLista+=`<select class="form-select mb-3" disabled><option></option></select>`;
     }else{
-    selectLista = `<select name="mid_${idmeta}" onfocusout="saveSelectEcm(${idmeta},${idProduto});" class="form-select mb-3">`;
+    selectLista = `<select name="mid_${idmeta}_${idProduto}" onfocusout="saveSelectEcm(${idmeta},${idProduto});" class="form-select mb-3">`;
     selectLista+=`<option selected></option>`;
     for(let i = 0; i < arrayDoId.length; i++){
         selectLista+=`<option value="${arrayDoId[i][3]}">${arrayDoId[i][3]}</option>`;
@@ -690,11 +837,11 @@ return selectLista;
 
 
 function numeroEcm(idmeta,idProduto){
-    return `<input name="mid_${idmeta}" onfocusout="saveNumberEcm(${idmeta},${idProduto});" type="number" class="form-control" placeholder="Digite um número aqui"/>`
+    return `<input name="mid_${idmeta}_${idProduto}" onfocusout="saveNumberEcm(${idmeta},${idProduto});" type="number" class="form-control" placeholder="Digite um número aqui"/>`
 }
 function logicoEcm(idmeta,idProduto){
     return `
-    <select id="valorBool" name="mid_${idmeta}" onfocusout="saveBoolEcm(${idmeta},${idProduto})" class="form-select form-select-lg mb-3">
+    <select id="valorBool" name="mid_${idmeta}_${idProduto}" onfocusout="saveBoolEcm(${idmeta},${idProduto})" class="form-select form-select-lg mb-3">
     <option selected></option>
     <option value="sim">Sim</option>
     <option value="nao">Não</option>
@@ -702,7 +849,7 @@ function logicoEcm(idmeta,idProduto){
     `;
 }
 function textEcm(idmeta,idProduto){
-    return `<input onfocusout="saveTextEcm(${idmeta},${idProduto});" name="mid_${idmeta}" type="text" class="form-control" placeholder="Digite um texto"/>`
+    return `<input onfocusout="saveTextEcm(${idmeta},${idProduto});" name="mid_${idmeta}_${idProduto}" type="text" class="form-control" placeholder="Digite um texto"/>`
 }
 
 // monta tabela skus
@@ -789,7 +936,7 @@ function pesquisaProduto(){
                               ISNULL((SELECT DISTINCT 'S' FROM sankhya.TGFICP t  WHERE t.CODPROD = z.CODPROD),'N') as KIT
                               FROM TGFPRO z
                               WHERE z.USOPROD = 'R' 
-                              AND CONCAT(z.COMPLDESC ,' ', z.MARCA) like UPPER('%`+prodesc+`%')
+                              AND CONCAT(z.COMPLDESC ,' ', z.MARCA, ' ', z.CODPROD) like UPPER('%`+prodesc+`%')
                               AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS) 
                               ORDER BY z.REFERENCIA`;
   
@@ -859,7 +1006,6 @@ function importarProduto(codprod) {
     let qtdMarca    = getDadosSql(sql); 
     let idmarca     = 0;
   
-    console.log(qtdprod)
   
     if(qtdprod[0][0] > 0 && qtdsku[0][0] > 0 ) {
       alertaMsg("Produto já importado ! SKU ja importado");
@@ -929,7 +1075,8 @@ function gridProdutos(){
                               ae.NAME AS MARCA,
                               (SELECT COUNT(*) FROM AD_ECMSKUS WHERE PRODUTOID = ep.IDPRODUTO) AS QTDSKUS
                               FROM AD_ECMPRODUTOS ep 
-                              INNER JOIN AD_ECMMARCAS ae on (ep.BRANDID = ae.IDMARCA)`;
+                              INNER JOIN AD_ECMMARCAS ae on (ep.BRANDID = ae.IDMARCA)
+                              ORDER BY IDPRODUTO DESC`;
   
     let   data    = getDadosSql(sql, true);
     let   dados   = [];
@@ -1113,6 +1260,7 @@ function saveProduto(idproduto){
     let metaDescription     = $("#metaDescricao").val();
     let longDescription     = $("#editor").val();
     let keyWords            = $("#palavrasChave").val();
+    console.log(keyWords)
     let warrantyDescription = $("#garantia").val();
     let displayAvailability = $("#exibeDisponibilidade").val();
     let displayPrice        = $("#exibePreco").val();
@@ -1126,118 +1274,124 @@ function saveProduto(idproduto){
     let isvisible           = $("#visivel").val();
     let displayStockqty     = $("#exibeEstoque").val();
 
+    if(categoryid){
 
-    const data = JSON.stringify({
-        "serviceName":"CRUDServiceProvider.saveRecord",
-        "requestBody":{
-            "dataSet":{
-                "rootEntity":"AD_ECMPRODUTOS",
-                "includePresentationFields":"S",
-                "dataRow":{
-                    "localFields":{
-                        "NOMEPROD":{
-                            "$" : name
+        const data = JSON.stringify({
+            "serviceName":"CRUDServiceProvider.saveRecord",
+            "requestBody":{
+                "dataSet":{
+                    "rootEntity":"AD_ECMPRODUTOS",
+                    "includePresentationFields":"S",
+                    "dataRow":{
+                        "localFields":{
+                            "NOMEPROD":{
+                                "$" : name
+                            },
+                            "SENDTOMARKETPLACE" : {
+                                "$" : sendtoMarketplace
+                            },
+                            "URLFRIENDLY":{
+                                "$" : urlFriendly
+                            },
+                            "DISPLAYAVAILABILITY":{
+                                "$" : displayAvailability
+                            },
+                            "LONGDESCRIPTION" : {
+                                "$" : longDescription
+                            },
+                            "SHORTDESCRIPTION" : {
+                                "$" : shortDescription
+                            },
+                            "METADESCRIPTION" : {
+                                "$" : metaDescription
+                            },
+                            "ISNEW":{
+                                "$": isNew
+                            },
+                            "USEACCEPTANCETERM" : {
+                                "$" : useAcceptanceterm
+                            },
+                            "METAKEYWORDS" : {
+                                "$" : keyWords
+                            },
+                            "WARRANTYDESCRIPTION" : {
+                                "$" : warrantyDescription
+                            },
+                            "ISDELETED":{
+                                "$": isDeleted
+                            },
+                            "DISPLAYPRICE":{
+                                "$": displayPrice
+                            },
+                            "DISPLAYSTOCKQTY":{
+                                "$": displayStockqty
+                            },
+                            "ISFREESHIPPING":{
+                                "$": isFreeshipping
+                            },
+                            "ISSEARCHABLE":{
+                                "$": isSearchable
+                            },
+                            "ISUPONREQUEST":{
+                                "$": isUponresquest
+                            },
+                            "ISVISIBLE":{
+                                "$": isvisible
+                            },
+                            "PAGETITLE" : {
+                                "$" : pageTitle
+                            },
+                            "CATEGORYID" : {
+                                "$" : categoryid
+                            },
+                            "ENVIAR" : {
+                                "$" : "S"
+                            }
                         },
-                        "SENDTOMARKETPLACE" : {
-                            "$" : sendtoMarketplace
-                        },
-                        "URLFRIENDLY":{
-                            "$" : urlFriendly
-                        },
-                        "DISPLAYAVAILABILITY":{
-                            "$" : displayAvailability
-                        },
-                        "LONGDESCRIPTION" : {
-                            "$" : longDescription
-                        },
-                        "SHORTDESCRIPTION" : {
-                            "$" : shortDescription
-                        },
-                        "METADESCRIPTION" : {
-                            "$" : metaDescription
-                        },
-                        "ISNEW":{
-                            "$": isNew
-                        },
-                        "USEACCEPTANCETERM" : {
-                            "$" : useAcceptanceterm
-                        },
-                        "METAKEYWORDS" : {
-                            "$" : keyWords
-                        },
-                        "WARRANTYDESCRIPTION" : {
-                            "$" : warrantyDescription
-                        },
-                        "ISDELETED":{
-                            "$": isDeleted
-                        },
-                        "DISPLAYPRICE":{
-                            "$": displayPrice
-                        },
-                        "DISPLAYSTOCKQTY":{
-                            "$": displayStockqty
-                        },
-                        "ISFREESHIPPING":{
-                            "$": isFreeshipping
-                        },
-                        "ISSEARCHABLE":{
-                            "$": isSearchable
-                        },
-                        "ISUPONREQUEST":{
-                            "$": isUponresquest
-                        },
-                        "ISVISIBLE":{
-                            "$": isvisible
-                        },
-                        "PAGETITLE" : {
-                            "$" : pageTitle
-                        },
-                        "CATEGORYID" : {
-                            "$" : categoryid
-                        },
-                        "ENVIAR" : {
-                            "$" : "S"
+                        "key" : {
+                            "IDPRODUTO" : {
+                                "$" : idproduto
+                            }
                         }
-                    },
-                    "key" : {
-                        "IDPRODUTO" : {
-                            "$" : idproduto
+                    }, 
+                    "entity":{
+                        "fieldset":{
+                        "list":"IDPRODUTO"
                         }
-                    }
-                }, 
-                "entity":{
-                    "fieldset":{
-                    "list":"IDPRODUTO"
                     }
                 }
             }
-        }
-    });
+        });
+    
+    
+        const xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+    
+        xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === this.DONE) {
+            //console.log(this.responseText);
+            let data2 = JSON.parse(this.response);
+            if(data2.responseBody != undefined){
+                alertaMsg('Produto atualizado com sucesso! ','S');
+                result = data2.responseBody.entities.entity;
+            }else{
+              alertaMsg('Erro ao atualizar produto! <br> Erro : <br> '+this.responseText,'E');
+            }
+        }});
+    
+        let dataJson = JSON.parse(data)
+        console.log(dataJson)
+    
+        xhr.open("POST", url, false);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(data);
+        console.log(data)
+        return result
+    }
+    else{
+        alertaMsg("Erro, o campo categoria deve estar preenchido","E")
+    }
 
-
-    const xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
-
-    xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === this.DONE) {
-        //console.log(this.responseText);
-        let data2 = JSON.parse(this.response);
-        if(data2.responseBody != undefined){
-            alertaMsg('Produto atualizado com sucesso! ','S');
-            result = data2.responseBody.entities.entity;
-        }else{
-          alertaMsg('Erro ao atualizar produto! <br> Erro : <br> '+this.responseText,'E');
-        }
-    }});
-
-    let dataJson = JSON.parse(data)
-    console.log(dataJson)
-
-    xhr.open("POST", url, false);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(data);
-    console.log(data)
-    return result
 }
 
 

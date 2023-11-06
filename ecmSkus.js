@@ -231,6 +231,7 @@ function viewSku(idsku) {
     let sql = '';
     sql = `select ae.*,ae2.NOMEPROD  from AD_ECMSKUS ae inner join AD_ECMPRODUTOS ae2 on ae2.IDPRODUTO  = ae.PRODUTOID WHERE IDSKU = ${idsku}`;
     let sku = getDadosSql(sql, true);
+    console.log(sql)
     sql = `SELECT *, (select count(*) from AD_PRODUTOVOLUMES ap where ap.CODPROD = p.CODPROD  ) as QTDVOL  FROM TGFPRO p WHERE p.CODPROD = ${sku[0].PRODUTOIDSK}`;
     let produtosk = getDadosSql(sql,true);
     sql = `select * from TGFBAR where CODPROD = ${sku[0].PRODUTOIDSK}`;
@@ -369,23 +370,23 @@ function viewSku(idsku) {
             <div class="row">
                 <div class="col-2">
                     <label class="form-label">Altura Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="alturaMontado"  id="alturaMontado" value="" disabled>
+                    <input type="text" class="form-control form-control-sm" name="alturaMontado"  id="alturaMontado" value="">
                 </div>
                 <div class="col-2">
                     <label class="form-label">Comp. Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="compMontado"  id="compMontado" value="" disabled>
+                    <input type="text" class="form-control form-control-sm" name="compMontado"  id="compMontado" value="">
                 </div>
                 <div class="col-2">
                     <label class="form-label">Largura Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="largMontado"  id="largMontado" value="" disabled>
+                    <input type="text" class="form-control form-control-sm" name="largMontado"  id="largMontado" value="">
                 </div>
                 <div class="col-2">
                     <label class="form-label">Tipo Medida Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="tipoMedida"  id="tipoMedida" value="" disabled>
+                    <input type="text" class="form-control form-control-sm" name="tipoMedida"  id="tipoMedida" value="">
                 </div>
                 <div class="col-2">
                     <label class="form-label">Peso Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="pesoMontado"  id="pesoMontado" value="" disabled>
+                    <input type="text" class="form-control form-control-sm" name="pesoMontado"  id="pesoMontado" value="">
                 </div>
             </div>
 
@@ -495,7 +496,7 @@ function viewSku(idsku) {
     $('#descSk').val(produtosk[0].DESCRPROD);
     $('#corSk').val(cor[0].DCRGRADEX);
     $('#voltagemSk').val(voltagem[0].DCRGRADEY);
-    $('#descEcmSku').val(sku[0].NOMEPROD + " " + voltagem[0].DCRGRADEY);
+    $('#descEcmSku').val(sku[0].NOMEPROD + " " + cor[0].DCRGRADEX + " " + voltagem[0].DCRGRADEY);
     $('#altFrete').val(produtosk[0].ALTURA);
     $('#largFrete').val(produtosk[0].LARGURA);
     $('#compFrete').val(produtosk[0].ESPESSURA);    

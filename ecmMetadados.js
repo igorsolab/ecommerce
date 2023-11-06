@@ -215,12 +215,14 @@ function addCatMetadado(id){
     INNER JOIN AD_ECMCATEGORIAS ecmc ON ecmc.IDCATEGORIA = ecmd.IDCATEGORIA  
     WHERE IDMETA = ${id}`
     let data    = getDadosSql(sql,true) 
+    console.log(data)
 
     for(let i = 0; i< data.length; i++){
         let key = {
             "CATEGORIAID"   : dataFormatSankhya(data[i].CATEGORIAID)
         }
         if(data[i].IDMETA==id && data[i].IDCATEGORIA == idCategoria ){
+            console.log("Entrei no if")
             if(data[i].ATIVO == "N"){
                 fields.IDMETA = dataFormatSankhya(id);
                 fields.IDCATEGORIA = dataFormatSankhya(idCategoria);
@@ -231,16 +233,14 @@ function addCatMetadado(id){
                 let msg = "Essa categoria já existe"
                 alertaMsg(msg,"E")
             }
-        }else{
-                    
-            fields.IDMETA = dataFormatSankhya(id);
-            fields.IDCATEGORIA = dataFormatSankhya(idCategoria);
-            fields.ATIVO = dataFormatSankhya('S')
-            console.log(fields)
-            saveRecord(entity,fields);
-        }
-        
+        }        
     }
+    fields.IDMETA = dataFormatSankhya(id);
+    fields.IDCATEGORIA = dataFormatSankhya(idCategoria);
+    fields.ATIVO = dataFormatSankhya('S')
+    console.log(fields)
+    saveRecord(entity,fields);
+
     addCategoriaTabela(id);
 
 
@@ -389,7 +389,7 @@ function viewMetadado(id) {
     $('#maxlength').val(meta.MAXLENGTH);
 
     // ajuste na edição
-    $('#inputtypeid').prop('disabled',true);
+    $('#inputtypeid').prop('enabled',true);
 
     // exibe opções caso o tipo seja 3 ou 4
     let tipo = $('#inputtypeid').val()
