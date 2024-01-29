@@ -17,32 +17,32 @@ function gridMetadados(){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn btn-outline-secondary"  onclick="novoMetadados();" href="#">Novo Metadado</a>
+                        <a class="btn btn btn-outline-secondary" onclick="novoMetadados();" href="#">Novo Metadado</a>
                     </li>
                     </ul>
                 </nav>
     `);
 
     tela.append(`
-        <div class="input-group mb-3 input-group-sm">
-            <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-            <input type="text" id="pesquisa" class="form-control">
-        </div>
-        <table 
-                data-toggle="table" 
-                data-search="true"
-                data-search-selector="#pesquisa"  
-                id="dataTb" 
-                class="table mt-2 table-striped w-100" 
-                style ="font-size: 0.80rem;"> 
-            <thead class="table-dark text-white">
-                <th data-field="IDMETA" data-sortable="true">ID METADADOS</th>
-                <th data-field="PROPERTYMETADATAID" data-sortable="true">ID ECM</th>
-                <th data-field="DISPLAYNAME" data-sortable="true">LABEL</th>
-                <th data-field="INPUTTYPEID" data-sortable="true">TIPO</th>
-                <th data-field="BOTAO"></th>
-            </thead>
-        </table>`);
+            <div class="input-group mb-3 input-group-sm">
+                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="pesquisa" class="form-control">
+            </div>
+            <table 
+                    data-toggle="table" 
+                    data-search="true"
+                    data-search-selector="#pesquisa"  
+                    id="dataTb" 
+                    class="table mt-2 table-striped w-100" 
+                    style ="font-size: 0.80rem;"> 
+                <thead class="table-dark text-white">
+                    <th data-field="IDMETA" data-sortable="true">ID METADADOS</th>
+                    <th data-field="PROPERTYMETADATAID" data-sortable="true">ID ECM</th>
+                    <th data-field="DISPLAYNAME" data-sortable="true">LABEL</th>
+                    <th data-field="INPUTTYPEID" data-sortable="true">TIPO</th>
+                    <th data-field="BOTAO"></th>
+                </thead>
+            </table>`);
 
         for(let i = 0; i < data.length; i++){
 
@@ -426,11 +426,10 @@ function gravaMetadados() {
                 }
     }
 
-    let result = saveRecord(entity, fields, key)
+    saveRecord(entity, fields, key)
 
-    console.log("Teste de saveRecord: ",result);
-
-    metaReload(result.IDMETA.$);
+    metaReload(idmeta);
+    // fechaModalMetadado()
 
 }
 
@@ -477,7 +476,14 @@ function gravaOpt() {
 
 function metaReload(idmeta) {
     $('#modalDetailXl').modal('hide');
+    alertaMsg("Metadado salvo com sucesso!",'S')
     startApp();
     gridMetadados();
     viewMetadado(idmeta);
+}
+
+
+function fechaModalMetadado(){
+    console.log("Fechando modal metadado")
+    $('#modalDetailXl').modal('hide');
 }

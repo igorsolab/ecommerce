@@ -72,8 +72,7 @@ function initHtml(){
               <div class="col-md-10 col-lg-10 p-3">
                 <div class="container-fluid">
                   <div class="row">
-                    <div class="col-12" id="dados">
-                    </div>
+                    <div class="col-12" id="dados"></div>
                   </div>
                 </div>
               </div>
@@ -103,44 +102,49 @@ function menu() {
 
   let html =`
         <li class="nav-item py-2 py-sm-0">
-          <a href="#" class="nav-link text-white" aria-current="page"> 
-            <i class="fs-5 fa fa-gauge"></i> <span class=" fs-6 ms-1 d-none d-sm-inline">Dashboard</span> 
-          </a>
+            <a href="#" class="nav-link text-white" aria-current="page"> 
+              <i class="fs-5 fa fa-gauge"></i> <span class=" fs-6 ms-1 d-none d-sm-inline">Dashboard</span> 
+            </a>
         </li>
         <li class="nav-item py-2 py-sm-0">
-          <a href="#"  onclick="gridProdutos();" class="nav-link text-white" aria-current="page"> 
-            <i class="fs-5 fa-sharp fa-solid fa-boxes-stacked"></i>  <span class=" fs-8 ms-1 d-none d-sm-inline">Produtos</span> <span class="badge fs-9 ms-1 bg-info">${qtdProd[0][0]}</span>
-          </a>
+            <a href="#"  onclick="gridProdutos();" class="nav-link text-white" aria-current="page"> 
+              <i class="fs-5 fa-sharp fa-solid fa-boxes-stacked"></i>  <span class=" fs-8 ms-1 d-none d-sm-inline">Produtos</span> <span class="badge fs-9 ms-1 bg-info">${qtdProd[0][0]}</span>
+            </a>
         </li>
         <li class="nav-item py-2 py-sm-0">
-          <a href="#" onclick="gridSKUS()" class="nav-link text-white" aria-current="page"> 
-             <i class=" fs-5 fa-solid fa-box"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">SKUs</span> <span class="badge fs-10 ms-1 bg-info">${qtdSKU[0][0]}</span> 
-          </a>
+            <a href="#" onclick="gridSKUS()" class="nav-link text-white" aria-current="page"> 
+              <i class=" fs-5 fa-solid fa-box"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">SKUs</span> <span class="badge fs-10 ms-1 bg-info">${qtdSKU[0][0]}</span> 
+            </a>
         </li>
         <li class="nav-item py-2 py-sm-0">
-          <a href="#" onclick="gridCategorias()" class="nav-link text-white" aria-current="page"> 
-            <i class="fs-5 fa-solid fa-folder-tree"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Categorias</span> <span class="badge fs-9 ms-1 bg-info">${qtdCat[0][0]}</span> 
-          </a>
+            <a href="#" onclick="gridCategorias()" class="nav-link text-white" aria-current="page"> 
+              <i class="fs-5 fa-solid fa-folder-tree"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Categorias</span> <span class="badge fs-9 ms-1 bg-info">${qtdCat[0][0]}</span> 
+            </a>
         </li>
         <li class="nav-item py-2 py-sm-0">
-        <a href="#" class="nav-link text-white" aria-current="page"> 
-          <i class="fs-5 fa-regular fa-object-group"></i> <span class=" fs-8 ms-1 d-none d-sm-inline">Grupos de Categorias</span> <span class="badge fs-9 ms-1 bg-info">${qtdGrp[0][0]}</span>
+          <a href="#" class="nav-link text-white" onclick="gridGrupoCategoria()" aria-current="page"> 
+            <i class="fs-5 fa-regular fa-object-group"></i> <span class=" fs-8 ms-1 d-none d-sm-inline">Grupos de Categorias</span> <span class="badge fs-9 ms-1 bg-info">${qtdGrp[0][0]}</span>
+          </a>
+      </li>
+      <li class="nav-item py-2 py-sm-0">
+        <a href="#" onclick="gridEtiquetas()" class="nav-link text-white" aria-current="page"> 
+          <i class="fs-5 fa-solid fa-tags"></i>  <span class=" fs-7 ms-1 d-none d-sm-inline">Etiquetas</span> <span class="badge fs-9 ms-1 bg-info">${qtdEtq[0][0]}</span> 
         </a>
       </li>
       <li class="nav-item py-2 py-sm-0">
-      <a href="#" onclick="gridEtiquetas()" class="nav-link text-white" aria-current="page"> 
-        <i class="fs-5 fa-solid fa-tags"></i>  <span class=" fs-7 ms-1 d-none d-sm-inline">Etiquetas</span> <span class="badge fs-9 ms-1 bg-info">${qtdEtq[0][0]}</span> 
-      </a>
+        <a href="#" onclick="gridMarcas();" class="nav-link text-white" aria-current="page"> 
+          <i class="fs-5 fa-regular fa-copyright"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Marcas</span> <span class="badge fs-9 ms-1 bg-info">${qtdMarcas[0][0]}</span> 
+        </a>
       </li>
       <li class="nav-item py-2 py-sm-0">
-      <a href="#" onclick="gridMarcas();" class="nav-link text-white" aria-current="page"> 
-        <i class="fs-5 fa-regular fa-copyright"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Marcas</span> <span class="badge fs-9 ms-1 bg-info">${qtdMarcas[0][0]}</span> 
-      </a>
+        <a href="#" onclick="gridMetadados();" class="nav-link text-white" aria-current="page"> 
+          <i class="fs-5 fa-solid fa-table"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Metadados</span> <span class="badge fs-9 ms-1 bg-info">${qtdMetadados[0][0]}</span> 
+        </a>
       </li>
       <li class="nav-item py-2 py-sm-0">
-      <a href="#" onclick="gridMetadados();" class="nav-link text-white" aria-current="page"> 
-        <i class="fs-5 fa-solid fa-table"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Metadados</span> <span class="badge fs-9 ms-1 bg-info">${qtdMetadados[0][0]}</span> 
-      </a>
+        <a href="#" onclick="modalPesquisaProduto();" class="nav-link text-white" aria-current="page"> 
+        <i class="bi bi-plus-circle-fill"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Cadastro de Produtos</span>
+        </a>
       </li>
   `;
 
@@ -459,20 +463,34 @@ function convertDataToSankhya(data) {
       date = new Date;
       convertedDate = date.toLocaleString();
   } else {
-      date = doncDate;
+      date = data;
   
       const ano = date.slice(0, 4);
       const mes = date.slice(5, 7);
       const dia = date.slice(8, 10);
       const horas = date.slice(11, 13);
       const minutos = date.slice(14, 16);
-      const segundos = date.slice(17, 19);
+      // const segundos = date.slice(17, 19);
   
-      convertedDate = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+      convertedDate = `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+      console.log(convertedDate)
   }
-  return convertedDate.replace(',','');;
+  return convertedDate.replace(',','');
 }
 
+function convertDateForServer(data) {
+
+      const dia = data.slice(0, 2);
+      const mes = data.slice(2, 4);
+      const ano = data.slice(4, 8);
+      const horas = data.slice(9, 11);
+      const minutos = data.slice(12, 14);
+      // const segundos = data.slice(15, 17);
+  
+      let convertedDate = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+      console.log(convertedDate)
+      return convertedDate.replace(',','');
+}
 
 // formata data padrao sankhya
 function dataFormatSankhya(data) {

@@ -2,18 +2,6 @@
 
 var telaProdutos = '';
 
-// Tela de pesquisa do Produto
-function telaPesquisaProd() {
-    let modal = $("#mPesquisaProduto")
-  
-    modal.modal('show');
-}
-
-// fecha tela de modal
-function fechaTelaPesquisaProduto() {
-    $("#mPesquisaProduto").modal('hide')
-}
-  
 function viewProduto(idproduto) {
 
     let tela    = $('#dados');
@@ -425,104 +413,159 @@ function buscaMetaDado(idProduto,idCategoria){
     
     let dados = getDadosSql(selectMetaDados)
     let cards_meta="";
-    if(dados.length === 0){
+    console.log(dados.length)
+    if(dados.length < 1){
         cards_meta += "Não há metadados definidos para essa categoria ou o tipo não foi definido"
     }
     else{
-    let categoriasPais = autorizaCategoriasPai(dados[0][6],dados[0][5]);
-    if(categoriasPais){
+        console.log("Entrei aqui")
+        let categoriasPais = autorizaCategoriasPai(dados[0][6],dados[0][5]);
+        console.log(categoriasPais)
+        if(categoriasPais){
 
-        let arraysconcat = dados.concat(categoriasPais)
-        const arraySemRepeticoes = arraysconcat.filter((array, index, self) => {
-            return (
-              index === self.findIndex((arr) => JSON.stringify(arr) === JSON.stringify(array))
-            );
-          });
+            let arraysconcat = dados.concat(categoriasPais)
+            console.log(arraysconcat)
+            const arraySemRepeticoes = arraysconcat.filter((array, index, self) => {
+                return (
+                    index === self.findIndex((arr) => JSON.stringify(arr) === JSON.stringify(array))
+                );
+            });
+            console.log(arraySemRepeticoes)
 
-        for(let i = 0; i < arraySemRepeticoes.length; i++){
-            if(arraySemRepeticoes[i]===undefined){
-                break;
-            }
-            let idmeta = arraySemRepeticoes[i][0];
-            let propertyName = arraySemRepeticoes[i][1];
-            let inputTypeId = arraySemRepeticoes[i][2];
-            let displayName = arraySemRepeticoes[i][3];
-            let nameCategoria = arraySemRepeticoes[i][4];
-            let nivel = arraySemRepeticoes[i][5];
-            let conta = arraySemRepeticoes[i][6];
-            let idCategoriaPai = arraySemRepeticoes[i][7];
-            cards_meta += `                                            
-            <div class="col-4 mt-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6>${displayName}</h6>
-                        <p style="font-size:12px">${nameCategoria}</p>
-                        <p class="card-text">`;
+            for(let i = 0; i < arraySemRepeticoes.length; i++){
+                if(arraySemRepeticoes[i]===undefined){
+                    break;
+                }
+                let idmeta = arraySemRepeticoes[i][0];
+                let propertyName = arraySemRepeticoes[i][1];
+                let inputTypeId = arraySemRepeticoes[i][2];
+                let displayName = arraySemRepeticoes[i][3];
+                let nameCategoria = arraySemRepeticoes[i][4];
+                let nivel = arraySemRepeticoes[i][5];
+                let conta = arraySemRepeticoes[i][6];
+                let idCategoriaPai = arraySemRepeticoes[i][7];
+                cards_meta += `                                            
+                <div class="col-4 mt-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>${displayName}</h6>
+                            <p style="font-size:12px">${nameCategoria}</p>
+                            <p class="card-text">`;
 
-                            if(inputTypeId==1){
-                                cards_meta+=htmlEcm(idmeta,idProduto);
-                            }else if(inputTypeId==3){
-                                cards_meta+=multiEcm(idmeta,idProduto);
-                            }else if(inputTypeId==4){
-                                cards_meta+=listaEcm(idmeta,idProduto);
-                            }else if(inputTypeId==7){
-                                cards_meta+=numeroEcm(idmeta,idProduto);
-                            }else if(inputTypeId==9){
-                                cards_meta+=logicoEcm(idmeta,idProduto);
-                            }else if(inputTypeId==0){
-                                cards_meta+=textEcm(idmeta,idProduto);
-                            }else{
-                                cards_meta+="";
-                            }
-                            
-                        cards_meta+=`</p>
+                                if(inputTypeId==1){
+                                    cards_meta+=htmlEcm(idmeta,idProduto);
+                                }else if(inputTypeId==3){
+                                    cards_meta+=multiEcm(idmeta,idProduto);
+                                }else if(inputTypeId==4){
+                                    cards_meta+=listaEcm(idmeta,idProduto);
+                                }else if(inputTypeId==7){
+                                    cards_meta+=numeroEcm(idmeta,idProduto);
+                                }else if(inputTypeId==9){
+                                    cards_meta+=logicoEcm(idmeta,idProduto);
+                                }else if(inputTypeId==0){
+                                    cards_meta+=textEcm(idmeta,idProduto);
+                                }else{
+                                    cards_meta+="";
+                                }
+                                
+                            cards_meta+=`</p>
+                        </div>
                     </div>
-                </div>
-            </div><!-- col-4 -->`;
-        }
-    } 
-}
-$('#produtoMetaDado').append(cards_meta);
+                </div><!-- col-4 -->`;
+            }
+        } 
+        else {
 
-let sqlValores = `
-SELECT PMDT.VALOR, ECM.IDPRODUTO, PMDT.IDMETA,MDT.INPUTTYPEID 
-FROM AD_ECMPRODUTOMETADADOS PMDT 
-inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
-inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
-WHERE ECM.IDPRODUTO = ${idProduto}
-`
+            let arraysconcat = dados
+            const arraySemRepeticoes = arraysconcat.filter((array, index, self) => {
+                return (
+                index === self.findIndex((arr) => JSON.stringify(arr) === JSON.stringify(array))
+                );
+            });
+            console.log(arraySemRepeticoes)
 
-let dadosValores = getDadosSql(sqlValores,true)
+            for(let i = 0; i < arraySemRepeticoes.length; i++){
+                if(arraySemRepeticoes[i]===undefined){
+                    break;
+                }
+                let idmeta = arraySemRepeticoes[i][0];
+                let propertyName = arraySemRepeticoes[i][1];
+                let inputTypeId = arraySemRepeticoes[i][2];
+                let displayName = arraySemRepeticoes[i][3];
+                let nameCategoria = arraySemRepeticoes[i][4];
+                let nivel = arraySemRepeticoes[i][5];
+                let conta = arraySemRepeticoes[i][6];
+                let idCategoriaPai = arraySemRepeticoes[i][7];
+                cards_meta += `                                            
+                <div class="col-4 mt-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>${displayName}</h6>
+                            <p style="font-size:12px">${nameCategoria}</p>
+                            <p class="card-text">`;
 
-dadosValores.map((res) => {
-    let idmeta = res.IDMETA;
-    let valor = res.VALOR;
-    let idProduto = res.IDPRODUTO;
-    let inputTypeId = res.INPUTTYPEID;
-    if(inputTypeId == 1) {
-        $(`textarea[name="mid_${idmeta}_${idProduto}"]`).val(valor);
+                                if(inputTypeId==1){
+                                    cards_meta+=htmlEcm(idmeta,idProduto);
+                                }else if(inputTypeId==3){
+                                    cards_meta+=multiEcm(idmeta,idProduto);
+                                }else if(inputTypeId==4){
+                                    cards_meta+=listaEcm(idmeta,idProduto);
+                                }else if(inputTypeId==7){
+                                    cards_meta+=numeroEcm(idmeta,idProduto);
+                                }else if(inputTypeId==9){
+                                    cards_meta+=logicoEcm(idmeta,idProduto);
+                                }else if(inputTypeId==0){
+                                    cards_meta+=textEcm(idmeta,idProduto);
+                                }else{
+                                    cards_meta+="";
+                                }
+                                
+                            cards_meta+=`</p>
+                        </div>
+                    </div>
+                </div><!-- col-4 -->`;
+            }
+        } 
     }
-    else if(inputTypeId == 3) {
-        let valoresArray = valor.split(",");
-        for(let i = 0; i < valoresArray.length; i++) {
-            var checkbox = $(`input[name="mid_${idmeta}_${idProduto}"][value="${valoresArray[i]}"]`);
-            if(checkbox.length > 0){
-                checkbox[0].setAttribute("checked", "checked");
+    $('#produtoMetaDado').append(cards_meta);
+
+    let sqlValores = `
+    SELECT PMDT.VALOR, ECM.IDPRODUTO, PMDT.IDMETA,MDT.INPUTTYPEID 
+    FROM AD_ECMPRODUTOMETADADOS PMDT 
+    inner JOIN AD_ECMMETADATA MDT ON MDT.IDMETA = PMDT.IDMETA
+    inner JOIN AD_ECMPRODUTOS ECM ON ECM.IDPRODUTO = pmdt.IDPRODUTO
+    WHERE ECM.IDPRODUTO = ${idProduto}
+    `
+
+    let dadosValores = getDadosSql(sqlValores,true)
+
+    dadosValores.map((res) => {
+        let idmeta = res.IDMETA;
+        let valor = res.VALOR;
+        let idProduto = res.IDPRODUTO;
+        let inputTypeId = res.INPUTTYPEID;
+        if(inputTypeId == 1) {
+            $(`textarea[name="mid_${idmeta}_${idProduto}"]`).val(valor);
+        } else if(inputTypeId == 3) {
+            let valoresArray = valor.split(",");
+            for(let i = 0; i < valoresArray.length; i++) {
+                var checkbox = $(`input[name="mid_${idmeta}_${idProduto}"][value="${valoresArray[i]}"]`);
+                if(checkbox.length > 0){
+                    checkbox[0].setAttribute("checked", "checked");
+                }
             }
         }
+        else if(inputTypeId == 4 ||  inputTypeId == 9){
+            $(`select[name="mid_${idmeta}_${idProduto}"]`).val(valor)
+        }
+        else if(inputTypeId == 7 || inputTypeId == 0) {
+            $(`input[name="mid_${idmeta}_${idProduto}"]`).val(valor);
+        }
+    })          
+
     }
-    else if(inputTypeId == 4 ||  inputTypeId == 9){
-        $(`select[name="mid_${idmeta}_${idProduto}"]`).val(valor)
-    }
-    else if(inputTypeId == 7 || inputTypeId == 0) {
-        $(`input[name="mid_${idmeta}_${idProduto}"]`).val(valor);
-    }
-})
 
 
-           
-
-}
 function autorizaCategoriasPai(conta, nivel){
     let selectCategoriasPai = `
     SELECT IDCATEGORIA, CONTA , NIVEL , NAME 
@@ -919,153 +962,6 @@ function montaTabelaSkuNImp(sku,idproduto){
     tela.append(html);
 
 }
-
-// pesquisa de produto
-function pesquisaProduto(){
-    
-    let   prodesc = $('#proddesc').val()
-  
-    if(prodesc.length >= 2 ) {
-  
-      let   sql     = `SELECT z.CODPROD, 
-                              z.COMPLDESC AS DESCRICAO , 
-                              z.REFERENCIA AS SKU, 
-                              z.MARCA,
-                              z.ATIVO, 
-                              z.AD_FORADELINHA,
-                              ISNULL((SELECT DISTINCT 'S' FROM sankhya.TGFICP t  WHERE t.CODPROD = z.CODPROD),'N') as KIT
-                              FROM TGFPRO z
-                              WHERE z.USOPROD = 'R' 
-                              AND CONCAT(z.COMPLDESC ,' ', z.MARCA, ' ', z.CODPROD) like UPPER('%`+prodesc+`%')
-                              AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS) 
-                              ORDER BY z.REFERENCIA`;
-  
-      let   data    = getDadosSql(sql, true);
-      
-      let tabela    = $("#tbprodutos")
-  
-      tabela.empty();
-      for(let i = 0; i < data.length; i++){
-  
-        let disabled = ""
-        let botaoCls = "btn-outline-primary"
-  
-        if(data[i].ATIVO == 'N' || data[i].AD_FORADELINHA == 'S' || data[i].KIT == 'S') {
-          disabled = 'disabled';
-          botaoCls = 'btn-outline-secondary';
-        } 
-  
-        let botao = `
-        <div class="d-grid">
-          <button type="button" onclick="importarProduto(`+data[i].CODPROD+`)" class="btn ${botaoCls} btn-block btn-sm" style="font-size: 0.70rem" ${disabled}>Importar</button>
-        </div>`
-        let status = "";
-  
-        if(data[i].ATIVO == 'S' && data[i].AD_FORADELINHA == 'N') {
-          status =`<span class="badge bg-success">Ativo</span>`;
-        }else if(data[i].ATIVO == 'S' && data[i].AD_FORADELINHA == 'S'){
-          status = `<span class="badge bg-warning">Fora de Linha</span>`
-        }else{
-          status = `<span class="badge bg-secondary">Inativo</span>`
-        }
-  
-        tabela.append("<tr>"+
-                        "<td>"+data[i].CODPROD+"</td>"+
-                        "<td>"+data[i].DESCRICAO+"</td>"+
-                        "<td>"+data[i].MARCA+"</td>"+
-                        "<td>"+data[i].SKU+"</td>"+
-                        '<td style="text-align: center;">'+status+'</td>'+
-                        '<td style="text-align: center;">'+botao+'</td>'+
-                      "</tr>")
-  
-      }
-    }
-  
-}
-  
-  // importar produto e skus para ecommerce 
-function importarProduto(codprod) {
-    
-    fechaTelaPesquisaProduto();
-    
-    let sql = "select * from TGFPRO where codprod = "+codprod;
-    let produto = getDadosSql(sql,true);
-  
-    sql = "select count(*) from AD_ECMPRODUTOS WHERE SKU ='"+produto[0].AD_IDPRODUTO+"'";
-    let qtdprod = getDadosSql(sql);
-  
-    sql = "select ISNULL(MAX(IDPRODUTO),0) + 1 FROM AD_ECMPRODUTOS ae "
-    let numeracao   = getDadosSql(sql);
-    let urlfrendly  = formataUrl(produto[0].DESCRPROD);
-    let sku         = produto[0].AD_IDPRODUTO;
-    let name        = produto[0].DESCRPROD.trim();
-    let idproduto   = 0;
-    let marca       = produto[0].MARCA.trim();
-    
-    sql = `SELECT COUNT(*) FROM AD_ECMMARCAS WHERE NAME = '${marca}'`;
-    let qtdMarca    = getDadosSql(sql); 
-    let idmarca     = 0;
-  
-  
-    if(qtdprod[0][0] > 0 && qtdsku[0][0] > 0 ) {
-      alertaMsg("Produto já importado ! SKU ja importado");
-    } 
-  
-    if(qtdMarca == 0 ) {
-        let obj = {}
-        obj.NAME            = marca
-        obj.URL             = ''
-        obj.URLFRIENDLY     = formataUrl(marca)
-        obj.PAGETITLE       = txCapitular(marca)
-        obj.ALTERNATETITLE  = txCapitular(marca)
-        obj.ISENABLED       = 'S'
-        obj.KEYWORDS        = ''
-        obj.DESCRIPTION     = ''
-        obj.METADESCRIPTION = ''
-        obj.ENVIAR          = 'N'
-
-        idmarca = saveMarca(obj,'')
-    }else{
-      sql = `SELECT IDMARCA FROM AD_ECMMARCAS WHERE NAME = '${marca}'`;
-      idmarca = getDadosSql(sql);
-      idmarca = idmarca[0][0];
-    }
-  
-    if(qtdprod[0][0] == 0 ) {
-      idproduto = novoProduto(numeracao[0][0],sku, idmarca, name, urlfrendly, codprod);
-    }
-  
-    if(idproduto == 0  || idproduto == undefined){
-      sql = `SELECT IDPRODUTO FROM AD_ECMPRODUTOS WHERE SKU = '`+sku+`'`;
-      prod = getDadosSql(sql);
-      idproduto = prod[0][0];
-    }
-  
-    sql = `SELECT * FROM TGFPRO WHERE AD_IDPRODUTO = ${sku}`;
-    produtos = getDadosSql(sql,true);
-  
-    // varre em busca de skus
-    for(let i=0; i < produtos.length; i++){
-  
-      sql = `SELECT count(*) from AD_ECMSKUS WHERE PRODUTOIDSK = ${produtos[i].CODPROD}`;
-      let qtdsku = getDadosSql(sql);
-  
-      if(qtdsku[0][0] > 0) continue;
-  
-      if(produtos[i].ATIVO == 'N') continue;
-  
-      if(produtos[i].AD_FORADELINHA == 'S') continue;
-  
-      novoSku(produtos[i].REFERENCIA, produtos[i].COMPLDESC.trim(), idproduto, produtos[i].CODPROD);
-  
-    }
-  
-  
-    startApp();
-    gridProdutos();
-  
-}
-
 // monta tela de Produtos
 function gridProdutos(){
     let   sql     = `SELECT   ep.SKU,
@@ -1083,20 +979,6 @@ function gridProdutos(){
     let   tela    = $('#dados');
   
     tela.empty();
-  
-    // menu da tela de produtos
-    tela.append(`<nav class="navbar navbar-expand-sm mb-2 bg-light navbar-light">
-                  <ul class="navbar-nav">
-                    <li class="nav-item active">
-                      <a class="nav-link" href="#">
-                      <i class="fs-5 fa-sharp fa-solid fa-boxes-stacked"></i> <span class=" fs-6 ms-1 d-none d-sm-inline" >Produtos</span> 
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="btn btn btn-outline-secondary" onclick="telaPesquisaProd();" href="#">Importar Produto</a>
-                    </li>
-                  </ul>
-                </nav>`);
   
     // inclui tabela
     tela.append(`
@@ -1135,114 +1017,6 @@ function gridProdutos(){
         "data"      : dados
     })
 }
-
-// inclui novo produto
-function novoProduto(idproduto, sku, idmarca, name, urlfrendly, produtoidsk){
-
-    let codprod;
-
-    url = "http://"+hostname+":"+port+"/mge/service.sbr?serviceName=CRUDServiceProvider.saveRecord&outputType=json&mgeSession="+jnid;
-    let dataBr = convertDataToSankhya();
-
-    const data = JSON.stringify({
-       "serviceName":"CRUDServiceProvider.saveRecord",
-       "requestBody":{
-          "dataSet":{
-             "rootEntity":"AD_ECMPRODUTOS",
-             "includePresentationFields":"S",
-             "dataRow":{
-                "localFields":{
-                    "IDPRODUTO" : {
-                      "$" : idproduto
-                    },
-                    "SKU":{
-                      "$": sku
-                    },
-                    "NAME":{
-                      "$" : name
-                    },
-                    "BRANDID" : {
-                      "$" : idmarca
-                    },
-                    "DATA_INC":{
-                      "$" : dataBr
-                    },
-                    "SENDTOMARKETPLACE" : {
-                        "$" : "N"
-                    },
-                    "URLFRIENDLY":{
-                      "$" : urlfrendly
-                    },
-                    "DISPLAYAVAILABILITY":{
-                        "$": "S"
-                    },
-                    "ISNEW":{
-                      "$": "S"
-                    },
-                    "USEACCEPTANCETERM" : {
-                        "$" : "N"
-                    },
-                    "ISDELETED":{
-                      "$": "N"
-                    },
-                    "DISPLAYPRICE":{
-                        "$": "S"
-                    },
-                    "DISPLAYSTOCKQTY":{
-                      "$": "N"
-                    },
-                    "ISFREESHIPPING":{
-                        "$": "N"
-                    },
-                    "ISSEARCHABLE":{
-                        "$": "S"
-                    },
-                    "DISPLAYSTOCKQTY" :{
-                        "$" : "N"
-                    },
-                    "ISUPONREQUEST":{
-                        "$": "N"
-                    },
-                    "ISVISIBLE":{
-                        "$": "N"
-                    },
-                    "PAGETITLE" : {
-                      "$" : name
-                    },
-                    "PRODUTOIDSK" : {
-                      "$" : produtoidsk
-                    }
-                }
-             }, "entity":{
-                "fieldset":{
-                   "list":"IDPRODUTO"
-                }
-             }
-          }
-       }
-    });
-
-    const xhr = new XMLHttpRequest();
-    xhr.withCredentials = true;
-
-    xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === this.DONE) {
-        //console.log(this.responseText);
-        let data2 = JSON.parse(this.response);
-        if(data2.responseBody != undefined){
-          codprod =  data2.responseBody.entities.entity.IDPRODUTO.$;
-        }else{
-          alertaMsg('Erro ao criar produto! <br> Erro : <br> '+this.responseText,'E');
-        }
-    }});
-
-    xhr.open("POST", url, false);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.send(data);
-
-    return codprod;
-}
-
 
 function saveProduto(idproduto){
 
@@ -1393,49 +1167,3 @@ function saveProduto(idproduto){
     }
 
 }
-
-
-  
-// modal de pesquisa 
-function modalPesquisaProduto() {
-    return  `<div class="modal" id="mPesquisaProduto" data-backdrop="static">
-    <div class="modal-dialog modal-xl" >
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <h4 class="modal-title">Importar produto</h4>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <!-- Modal body -->
-        <div class="modal-body">
-          <form class="mb-3">
-            <div class="form-group">
-              <label for="email">Produto:</label>
-              <input type="email" class="form-control" onkeyup="pesquisaProduto();" placeholder="Digite para pesquisar" id="proddesc">
-            </div>
-          </form>
-          <div style="overflow-x:auto; overflow-y:auto;  height: 300px;>
-            <div class="table-responsive-lg">
-              <table class="table table-bordered table-striped" style=" font-size: 0.85rem">
-                <thead class="table-dark" style="position: sticky; top: 0;">
-                  <tr>
-                    <th>Codigo</th>
-                    <th>Descrição</th>
-                    <th>Marca</th>
-                    <th>SKU</th>
-                    <th>STATUS</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="tbprodutos">
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>`;
-}
-

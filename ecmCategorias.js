@@ -164,6 +164,14 @@ function exibeCategoria(idcategoria) {
     $('#keywords').val(categoria[0].KEYWORDS);
     $('#metadescription').val(categoria[0].METADESCRIPTION);
 
+    sql = `SELECT * FROM AD_ECMCATEGORIAGRUPOS WHERE IDCATEGORIA = ${idcategoria} AND ATIVO = 'S'`;
+    let gruposcategoria = getDadosSql(sql, true)
+    let elementoSelect = $('#selectgrupocategorias')
+    
+    let gruposSelecionados = gruposcategoria.map(item => item['IDGRUPOS'])
+    elementoSelect.val(gruposSelecionados.length === 0 ? 0 : gruposSelecionados)
+
+
     //  editor 
     editor.setValue(categoria[0].DESCRIPTION);
 
@@ -263,16 +271,14 @@ function novaFormCat() {
             </div>
             <div class="col-4">
                 <label class="form-label" for="metadescricao">Grupos</label>
-                <select class="form-select" multiple aria-label="multiple select example">
-                    <option selected>Open this select menu</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                <select class="form-select" multiple aria-label="multiple select example" id="selectgrupocategorias">
+                    <option selected value="0">Nenhuma das opções</option>
                 </select>
             </div>
-        </div>
-    `);
-    selectCategorias('idcategoriapai');
+        </div>`)
+
+        selectCategorias('idcategoriapai');
+        selectgrupocategorias()
 
     $('#name').keyup(function(){
         $('#url').val(formataUrl($('#name').val()))
@@ -288,6 +294,18 @@ function selectCategorias(select) {
     for(let i =0 ; i < categorias.length; i++) {
         let str = '&nbsp&nbsp'.repeat(categorias[i].NIVEL);
         componente.append(`<option value="${categorias[i].IDCATEGORIA}">${str}${categorias[i].NAME}</option>`);
+    }
+
+}
+
+function selectgrupocategorias() {
+
+    let componente = $('#selectgrupocategorias');
+    let sql = "select * from AD_ECMGRUPOSDECATEGORIA";
+    let categorias = getDadosSql(sql,true);
+
+    for(let i =0 ; i < categorias.length; i++) {
+        componente.append(`<option value="${categorias[i].IDGRUPOS}">${categorias[i].NAME}</option>`);
     }
 
 }
@@ -411,4 +429,60 @@ function saveCategoria(dados, key){
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.send(data);
   
+
+    let categoriagrupo = $("#selectgrupocategorias");
+    let fullOptions = categoriagrupo.find("option");
+    
+    let filteredOptions = fullOptions.filter(function() {
+        return $(this).val() !== "0";
+    });
+    
+    if (filteredOptions.length > 0) {
+        let fields = {};
+        let entity = "AD_ECMCATEGORIAGRUPOS";
+        fields.IDCATEGORIA = dataFormatSankhya(key)
+        filteredOptions.each((index, option) => {
+            console.log("Indice: " + index);
+            let idGrupo = parseInt($(option).val());
+    
+            if ($(option).is(":selected")) {
+                let sql = `SELECT * FROM ${entity} WHERE IDCATEGORIA = ${key} AND IDGRUPOS = ${idGrupo}`;
+                let dadosCategoriasGrupos = getDadosSql(sql, true);
+                console.log("IDGrupo " + idGrupo + " está selecionada");
+                if(dadosCategoriasGrupos.length > 0){
+                    fields.ATIVO = dataFormatSankhya("S")
+                    let chave = {
+                        "IDCATEGORIA": dataFormatSankhya(key),
+                        "IDCATEGORIAGRP":dataFormatSankhya(dadosCategoriasGrupos[0].IDCATEGORIAGRP)
+                    }
+                    saveRecord(entity, fields, chave)
+                }
+                else{
+                    fields.ATIVO = dataFormatSankhya("S")
+                    fields.IDGRUPOS = dataFormatSankhya(idGrupo)
+                    saveRecord(entity, fields)
+                }
+
+            } else {
+                let sql = `SELECT * FROM ${entity} WHERE IDCATEGORIA = ${key} AND IDGRUPOS = ${idGrupo}`;
+                let dadosCategoriasGrupos = getDadosSql(sql, true);
+
+                console.log("IDGrupo " + idGrupo + " não está selecionada");
+
+                if(dadosCategoriasGrupos.length > 0){
+                    let chave = {
+                        "IDCATEGORIA": dataFormatSankhya(key),
+                        "IDCATEGORIAGRP":dataFormatSankhya(dadosCategoriasGrupos[0].IDCATEGORIAGRP)
+                    }
+                    fields.ATIVO = dataFormatSankhya("N")
+                    fields.IDGRUPOS = dataFormatSankhya(idGrupo)
+                    saveRecord(entity, fields,chave)
+                }
+                else{
+                    console.log("Id grupo: " +idGrupo+ "; Id Categoria: "+key+"; Não foi salvo no banco pois não existe no banco nem foi selecionado")
+                }
+            }
+        });
+    }
+
 }

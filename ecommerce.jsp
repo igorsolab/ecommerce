@@ -71,6 +71,9 @@
 	<!-- <script language="JavaScript">
 		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script> -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmCadastroProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
 	<!-- Script Skus -->
 	<!-- <script language="JavaScript">
 		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmSkus.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
@@ -98,6 +101,9 @@
 	<!-- Script de API -->
 	<!-- <script language="JavaScript">
 		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script>
+	<script language="JavaScript">
+		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script> -->
 
 
@@ -134,6 +140,9 @@
 	<script language="JavaScript">
 		document.write('<script src="http://172.16.62.168/ecommerce/ecmProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
+	<script language="JavaScript">
+		document.write('<script src="http://172.16.62.168/ecommerce/ecmCadastroProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script>
 	<!-- Script Skus -->
 	<script language="JavaScript">
 		document.write('<script src="http://172.16.62.168/ecommerce/ecmSkus.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
@@ -159,9 +168,12 @@
 		document.write('<script src="http://172.16.62.168/ecommerce/ecmUtils.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script de API -->
-	<script language="JavaScript">
+	 <script language="JavaScript">
 		document.write('<script src="http://172.16.62.168/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
+	<script language="JavaScript">
+		document.write('<script src="http://172.16.62.168/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> 
 
 	<snk:load/>
 </head>

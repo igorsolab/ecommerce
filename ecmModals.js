@@ -14,10 +14,10 @@ function initModals(){
   conteudo2.empty();
   conteudo2.append(modalAlert());
   conteudo2.append(modalDetalheXl());
-  conteudo2.append(modalPesquisaProduto()); // arquivo ecmProdutos.js
   conteudo2.append(modalDetalheSku()); // arquivo ecmSkus.js
   conteudo2.append(modalDetalheMarca()); // arquivo ecmMarcas.js
   conteudo2.append(modalDetalheEtiqueta()); // arquivo ecmEtiquetas.js
+  conteudo2.append(ModalExcluirItemGrpCategoria())
 }
 
 
@@ -66,4 +66,22 @@ function modalDetalheXl(){
           </div>
       </div>
   </div>`
+}
+
+function ModalExcluirItemGrpCategoria(){
+return `<div class="modal fade" id="modalExcluirItemCategoria" tabindex="-1">
+<div class="modal-dialog modal-sm">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Apagar categoria do grupo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="bodyExcluirItemGrpCategoria">
+          ...
+        </div>
+        <div class="modal-footer" id="footer-excluir-categoria">
+        </div>
+    </div>
+</div>
+</div>`
 }

@@ -1,13 +1,34 @@
 
 // tela de SKUS
 function gridSKUS(){
-    let   sql     = `select  ae.IDSKU,	
-                              ae.SKU, 
-                              ae.PRODUCTID, 
-                              ae.NAME, 
-                              ISNULL(( SELECT  CASE  WHEN (ESTOQUE - RESERVADO - 5) > 0 THEN ESTOQUE - RESERVADO - 5 ELSE 0 END  as QTD  FROM TGFEST est WHERE  est.CODEMP = 4 and est.CODLOCAL = 2001 AND est.CODPROD = ae.PRODUTOIDSK  ),0) as ESTOQUE, 
-                              ( SELECT CASE WHEN COUNT(*) > 0 THEN 'S' ELSE 'N' END FROM TGFIMAL WHERE CODPROD = ae.PRODUTOIDSK) as FOTO 
-                              from AD_ECMSKUS ae `;
+    let   sql     = `SELECT  ae.IDSKU,	
+                        ae.SKU, 
+                        ae.PRODUCTID, 
+                        ae.NAME, 
+                        ISNULL((
+                            SELECT  
+                                CASE  
+                                    WHEN (ESTOQUE - RESERVADO - 5) > 0 THEN ESTOQUE - RESERVADO - 5 
+                                    ELSE 0 
+                                END  as QTD  
+                            FROM TGFEST est 
+                            WHERE  est.CODEMP = 4 
+                            and est.CODLOCAL = 2001 
+                            AND est.CODPROD = ae.PRODUTOIDSK  ),0) as ESTOQUE, 
+                            (SELECT
+                                CASE 
+                                    WHEN ae2.IMG01_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG02_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG03_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG04_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG05_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG06_ENV = 'S' THEN 'S'
+                                    WHEN ae2.IMG07_ENV = 'S' THEN 'S'
+                                    ELSE 'N' 
+                                END 
+                            FROM AD_ECMSKUSIMG ae2
+                            WHERE ae2.IDSKU = ae.IDSKU ) as FOTO 
+                    FROM AD_ECMSKUS ae `;
   
     let   data    = getDadosSql(sql, true);
     let   dados   = [];
@@ -208,8 +229,8 @@ function modalDetalheSku(){
             <div class="modal-content">
         
                 <div class="modal-header">
-                <h5 class="modal-title">Edição - <span id="titleDetalheSku"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title">Edição - <span id="titleDetalheSku"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
         
                 <!-- Modal body -->
@@ -218,7 +239,7 @@ function modalDetalheSku(){
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-ban"></i> Cancelar</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><i class="fa-regular fa-floppy-disk"></i> Salvar</button>
+                    <button type="button" onclick="salvarSku()" class="btn btn-primary" data-bs-dismiss="modal"><i class="fa-regular fa-floppy-disk"></i> Salvar</button>
                 </div>
             </div>
         </div>
@@ -229,17 +250,20 @@ function modalDetalheSku(){
 function viewSku(idsku) {
     
     let sql = '';
-    sql = `select ae.*,ae2.NOMEPROD  from AD_ECMSKUS ae inner join AD_ECMPRODUTOS ae2 on ae2.IDPRODUTO  = ae.PRODUTOID WHERE IDSKU = ${idsku}`;
+    sql = `select ae.*,ae2.NOMEPROD, ae2.IDPRODUTO, ae2.ASSEMBLEDHEIGHT, ae2.ASSEMBLEDWIDTH, ae2.ASSEMBLEDTHICKNESS, ae2.TYPEMEASUREASSEMBLED, ae2.WEIGHTASSEMBLED from AD_ECMSKUS ae inner join AD_ECMPRODUTOS ae2 on ae2.IDPRODUTO  = ae.PRODUTOID WHERE IDSKU = ${idsku}`;
     let sku = getDadosSql(sql, true);
     console.log(sql)
     sql = `SELECT *, (select count(*) from AD_PRODUTOVOLUMES ap where ap.CODPROD = p.CODPROD  ) as QTDVOL  FROM TGFPRO p WHERE p.CODPROD = ${sku[0].PRODUTOIDSK}`;
     let produtosk = getDadosSql(sql,true);
     sql = `select * from TGFBAR where CODPROD = ${sku[0].PRODUTOIDSK}`;
     let ean = getDadosSql(sql,true);
+    console.log(sql)
     sql = `SELECT * FROM AD_GRADEX WHERE IDGRADEX = ${produtosk[0].AD_IDGRADEX}`;
     let cor = getDadosSql(sql,true);
+    console.log(sql)
     sql = `SELECT * FROM AD_GRADEY WHERE IDGRADEY = ${produtosk[0].AD_IDGRADEY}`;
     let voltagem = getDadosSql(sql,true);
+    console.log(sql)
     let medidaFrete = '';
     let volumes  = 1;
 
@@ -272,6 +296,7 @@ function viewSku(idsku) {
         statusSk = "Inativo";
     }
 
+    
 
     // montando a tela 
     let tela = $("#bodyDetalheSku");
@@ -381,8 +406,12 @@ function viewSku(idsku) {
                     <input type="text" class="form-control form-control-sm" name="largMontado"  id="largMontado" value="">
                 </div>
                 <div class="col-2">
-                    <label class="form-label">Tipo Medida Montado</label>
-                    <input type="text" class="form-control form-control-sm" name="tipoMedida"  id="tipoMedida" value="">
+                    <label class="form-label">Tipo medida Montado</label>
+                    <select class="form-select form-select-sm" id="tipoMedida" name="tipoMedida" >
+                        <option value="CM">Centimetro</option>
+                        <option value="M">Metro</option>
+                        <option value="MM">Milimetro</option>
+                    </select>
                 </div>
                 <div class="col-2">
                     <label class="form-label">Peso Montado</label>
@@ -450,7 +479,7 @@ function viewSku(idsku) {
                                 <div class="col-2">
                                     <label class="form-label" for="visivel">Visivel no Site?</label>
                                     <select class="form-select form-select-sm" id="visivel">
-                                        <option value="S">Sim</option>
+                                        <option selected value="S">Sim</option>
                                         <option value="N">Não</option>
                                     </select>
                                 </div>
@@ -503,6 +532,31 @@ function viewSku(idsku) {
     $('#pesoFrete').val(produtosk[0].PESOBRUTO);
     $('#medidaFrete').val(medidaFrete);
     $('#qtdVolumes').val(volumes);
+    $("#alturaMontado").val(sku[0].ASSEMBLEDHEIGHT)
+    $("#compMontado").val(sku[0].ASSEMBLEDTHICKNESS)
+    $("#largMontado").val(sku[0].ASSEMBLEDWIDTH)
+    $("#tipoMedida").val(sku[0].TYPEMEASUREASSEMBLED)
+    $("#pesoMontado").val(sku[0].WEIGHTASSEMBLED)
+
+    $('#limiteDevolucao').val(sku[0].BACKORDERLIMIT)
+    $('#descEcmSku').val(sku[0].NAME)
+    $('#permiteDevolucao').val(sku[0].BACKORDERABLE)
+    let condition = sku[0].CONDITIONID
+    $('#exibeCondicao').val(condition === 1 ? "S" : "N")
+    $('#definitionid').val(sku[0].DEFINITIONID)
+    $('#deletado').val(sku[0].ISDELETED)
+    $('#visivel').val(sku[0].ISVISIBLE)
+    $('#contrlEstoque').val(sku[0].MANAGESTOCK)
+    $('#qtdMax').val(sku[0].MAXIMUMQTYALLOWED)
+    $('#qtdMin').val(sku[0].MINIMUMQTYALLOWED)
+    $('#prepedidoApartir').val(sku[0].PREORDERDATE !== null ? convertDateForServer(sku[0].PREORDERDATE) : "")
+    $('#limiteprepedido').val(sku[0].PREORDERLIMIT)
+    $('#prepedido').val(sku[0].PREORDERABLE)
+    $('#visivelApartir').val(sku[0].VISIBLEFROM !== null ? convertDateForServer(sku[0].VISIBLEFROM) : "")
+    $('#visivelAte').val( sku[0].VISIBLETO !== null ? convertDateForServer(sku[0].VISIBLETO) : "")
+
+
+
 
     let modalSkus = $("#modalDetalheSku");
     modalSkus.modal('show');
@@ -698,6 +752,58 @@ function enviaUrlVideo(idsku){
     listFotos(idsku);
 }
 
+function salvarSku(){
+
+    let produtoidsk = $("#mCodigoSk").val()
+
+    let sql = "SELECT * FROM AD_ECMSKUS WHERE PRODUTOIDSK = "+produtoidsk;
+
+    let dados = getDadosSql(sql, true)
+    console.log(dados[0])
+
+    let fields = {}
+    let entity = "AD_ECMSKUS";
+    let key = {
+        "IDSKU":dataFormatSankhya(dados[0].IDSKU)
+    }
+
+    let condition = $('#exibeCondicao').val()
+
+    console.log($('#visivelApartir').val())
+    console.log($('#visivelAte').val())
+
+    fields.BACKORDERLIMIT = dataFormatSankhya($('#limiteDevolucao').val())
+    fields.NAME = dataFormatSankhya($('#descEcmSku').val())
+    fields.BACKORDERABLE = dataFormatSankhya($('#permiteDevolucao').val())
+    fields.CONDITIONID = dataFormatSankhya(condition === "S" ? 1 : 0)
+    fields.DEFINITIONID = dataFormatSankhya($('#definitionid').val())
+    fields.ISDELETED = dataFormatSankhya($('#deletado').val())
+    fields.ISVISIBLE = dataFormatSankhya($('#visivel').val())
+    fields.MANAGESTOCK = dataFormatSankhya($('#contrlEstoque').val())
+    fields.MAXIMUMQTYALLOWED = dataFormatSankhya($('#qtdMax').val())
+    fields.MINIMUMQTYALLOWED = dataFormatSankhya($('#qtdMin').val())
+    fields.PREORDERDATE = dataFormatSankhya($('#prepedidoApartir').val() === "" ? "" : convertDataToSankhya($('#prepedidoApartir').val()))
+    fields.PREORDERLIMIT = dataFormatSankhya($('#limiteprepedido').val())
+    fields.PREORDERABLE = dataFormatSankhya($('#prepedido').val())
+    fields.VISIBLEFROM = dataFormatSankhya($('#visivelApartir').val() === "" ? "" : convertDataToSankhya($('#visivelApartir').val()))
+    fields.VISIBLETO = dataFormatSankhya($('#visivelAte').val() === "" ? "" : convertDataToSankhya($('#visivelAte').val()))
+
+    saveRecord(entity, fields, key)
+
+    let camposMontado = {}
+    let entidade = "AD_ECMPRODUTOS"
+    let chave = {
+        "IDPRODUTO": dataFormatSankhya(dados[0].PRODUTOID)
+    }
+    camposMontado.ASSEMBLEDHEIGHT = dataFormatSankhya($("#alturaMontado").val())
+    camposMontado.ASSEMBLEDTHICKNESS = dataFormatSankhya($("#compMontado").val())
+    camposMontado.ASSEMBLEDWIDTH = dataFormatSankhya($("#largMontado").val())
+    camposMontado.TYPEMEASUREASSEMBLED = dataFormatSankhya($("#tipoMedida").val())
+    camposMontado.WEIGHTASSEMBLED = dataFormatSankhya($("#pesoMontado").val())
+
+    saveRecord(entidade,camposMontado,chave)
+}
+
 // inclusao de sku novo
 function novoSku(sku,name,produtoid,produtoidsk){
 
@@ -731,7 +837,7 @@ function novoSku(sku,name,produtoid,produtoidsk){
                       "$": "N"
                     },
                     "ISVISIBLE":{
-                      "$": "N"
+                      "$": "S"
                     },
                     "PRODUTOID" : {
                       "$" : produtoid
