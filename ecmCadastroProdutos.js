@@ -3,19 +3,30 @@ function modalPesquisaProduto() {
     <div id="mPesquisaProduto">
 
         <div class="row d-flex align-items-center">
-          <div class="col-6">
+          <div class="col-3">
             <form class="mb-3">
                 <div class="form-group">
                     <label for="email">Produto:</label>
-                    <input type="email" class="form-control" onkeyup="pesquisaProduto();" placeholder="Digite para pesquisar" id="proddesc">
+                    <input type="text" class="form-control" onkeyup="pesquisaProduto();" placeholder="Digite para pesquisar" id="proddesc">
                 </div>
             </form>
           </div>
-          <div class="form-check col-6">
-            <input class="form-check-input" onchange="pesquisaProduto();" type="checkbox" id="flexCheckChecked">
+          <div class="form-check col-3">
+            <input class="form-check-input" onchange="pesquisaProduto();" type="checkbox" id="checkprodutosativos" checked>
             <label class="form-check-label" for="flexCheckChecked">
               Apenas ativos
             </label>
+          </div>
+          <div class="form-check col-3">
+          <input class="form-check-input" onchange="pesquisaProduto();" type="checkbox" id="checkestoque" checked>
+          <label class="form-check-label" for="flexCheckChecked">
+            Apenas produtos com estoque
+          </label>
+        </div>
+          <div class="col-3" onchange="pesquisaProduto();">
+            <select class="form-select" id="categoriasProdutos" aria-label="Categorias">
+              <option value="" selected>Selecione uma categoria</option>
+            </select>
           </div>
 
         </div>
@@ -28,13 +39,13 @@ function modalPesquisaProduto() {
                     data-search-selector="#pesquisa">
                     <thead class="table-dark" style="position: sticky; top: 0;">
                         <tr>
-                            <th data-field="CODIGO">Codigo</th>
-                            <th data-field="DESCRICAO">Descrição</th>
-                            <th data-field="MARCA">Marca</th>
-                            <th data-field="SKU">SKU</th>
-                            <th data-field="STATUS" data-sortable="true">STATUS</th>
-                            <th data-field="ESTOQUE" data-sortable="true">ESTOQUE</th>
-                            <th data-field="CODIGO"></th>
+                            <th style="cursor:pointer" title="Ordenar por código" onclick="pesquisaProduto('z.CODPROD')">Codigo</th>
+                            <th style="cursor:pointer" title="Ordenar por descrição" onclick="pesquisaProduto('z.COMPLDESC')">Descrição</th>
+                            <th style="cursor:pointer" title="Ordenar por categoria" onclick="pesquisaProduto('gru.DESCRGRUPOPROD')">Categoria</th>
+                            <th>SKU</th>
+                            <th>STATUS</th>
+                            <th style="cursor:pointer" title="Ordenar por estoque" onclick="pesquisaProduto('vp.estoque_disponivel DESC')">ESTOQUE</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="tbprodutos"></tbody>
@@ -46,6 +57,28 @@ function modalPesquisaProduto() {
     let tela    = $('#dados');
     tela.empty();
     tela.append(importacaoProdutos);
+    
+    pesquisaProduto()
+    selectCategoriaImport()
+    // console.log(tela[0].outerHTML)
+}
+
+function selectCategoriaImport(){
+  let categoriasProdutos = $("#categoriasProdutos")
+  let sql = `
+    SELECT gru.CODGRUPOPROD, gru.DESCRGRUPOPROD FROM TGFGRU gru
+    INNER JOIN TGFPRO z ON z.CODGRUPOPROD = gru.CODGRUPOPROD
+    WHERE z.USOPROD = 'R'   
+    AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS) 
+    GROUP BY gru.CODGRUPOPROD, gru.DESCRGRUPOPROD , z.USOPROD 
+  `
+  let dados = getDadosSql(sql,true)
+
+  let options = ""
+  dados.forEach((element) => {
+    options += `<option value="${element.CODGRUPOPROD}">${element.DESCRGRUPOPROD}</option>`
+  })
+  categoriasProdutos.append(options)
 }
 
 // monta tabela skus
@@ -79,33 +112,39 @@ function montaTabelaSkuEcm(idproduto){
 
     tela.empty();
     tela.append(html);
-
 }
 // pesquisa de produto
-function pesquisaProduto(){
+function pesquisaProduto(ordenacao){
     
-    let   prodesc = $('#proddesc').val()
-    let   ativo   = $("#flexCheckChecked");
+    let prodesc = $('#proddesc').val();
+    let ativo   = $("#checkprodutosativos");
+    let categoria = $("#categoriasProdutos").val();
+    let checkestoque = $("#checkestoque");
+    console.log("Categoria: ",categoria)
   
-    if(prodesc.length >= 2 ) {
+    // if(prodesc.length >= 2 ) {
   
       let   sql     = ` SELECT z.CODPROD, 
                             z.COMPLDESC AS DESCRICAO , 
                             z.REFERENCIA AS SKU, 
-                            z.MARCA,
+                            gru.DESCRGRUPOPROD as CATEGORIA,
                             z.ATIVO, 
                             z.AD_FORADELINHA,
                             vp.estoque_disponivel as ESTOQUE,
                             ISNULL((SELECT DISTINCT 'S' FROM sankhya.TGFICP t  WHERE t.CODPROD = z.CODPROD),'N') as KIT
                             FROM TGFPRO z
                             INNER JOIN v_precoecommerce vp ON vp.codproduto = z.CODPROD
+                            INNER JOIN TGFGRU gru ON gru.CODGRUPOPROD = z.CODGRUPOPROD
                             WHERE z.USOPROD = 'R' 
+                            ${categoria ? `AND gru.CODGRUPOPROD = ${categoria}` : ""}
                             ${ativo.prop('checked') ? "AND z.ATIVO = 'S' AND z.AD_FORADELINHA = 'N'" : ''}
+                            ${checkestoque.prop('checked') ? "AND vp.estoque_disponivel > 0" : ''}
                             AND CONCAT(z.COMPLDESC ,' ', z.MARCA, ' ', z.CODPROD) like UPPER('%`+prodesc+`%')
                             AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS) 
-                            ORDER BY z.REFERENCIA`;
+                            ORDER BY ${ordenacao ? ordenacao : "z.REFERENCIA"}`;
   
       let   data    = getDadosSql(sql, true);
+      console.log(sql)
 
       let tabela    = $("#tbprodutos")
       tabela.empty();
@@ -138,7 +177,7 @@ function pesquisaProduto(){
         tabela.append("<tr>"+
                         "<td>"+data[i].CODPROD+"</td>"+
                         "<td>"+data[i].DESCRICAO+"</td>"+
-                        "<td>"+data[i].MARCA+"</td>"+
+                        "<td>"+data[i].CATEGORIA+"</td>"+
                         "<td>"+data[i].SKU+"</td>"+
                         '<td style="text-align: center;">'+status+'</td>'+
                         "<td>"+data[i].ESTOQUE+"</td>"+
@@ -146,14 +185,14 @@ function pesquisaProduto(){
                       "</tr>")
   
       }
-    }
+    // }
   
 }
   
   // importar produto e skus para ecommerce 
 function importarProduto(codprod) {
     
-    fechaTelaPesquisaProduto();
+    // fechaTelaPesquisaProduto();
     
     let sql = "select * from TGFPRO where codprod = "+codprod;
     let produto = getDadosSql(sql,true);
