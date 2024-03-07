@@ -738,9 +738,9 @@ function listFotos(idsku){
     // exibe video 
     let url = imgs[0].VIDEO;
     if(url.length > 0) {
-            url = url.replace('/watch?v=', '/embed/');
-            // url = url.substring(0, url.indexOf('&'));
-            $('#video').append('<iframe width="100%" height="100%" src="' + url + '" frameborder="0" allowfullscreen></iframe>');
+        url = url.replace('/watch?v=', '/embed/');
+        // url = url.substring(0, url.indexOf('&'));
+        $('#video').append('<iframe width="100%" height="100%" src="' + url + '" frameborder="0" allowfullscreen></iframe>');
     }
 
 }
