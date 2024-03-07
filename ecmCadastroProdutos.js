@@ -39,6 +39,7 @@ function modalPesquisaProduto() {
                     data-search-selector="#pesquisa">
                     <thead class="table-dark" style="position: sticky; top: 0;">
                         <tr>
+                            <td></th>
                             <th style="cursor:pointer" title="Ordenar por código" onclick="pesquisaProduto('z.CODPROD')">Codigo</th>
                             <th style="cursor:pointer" title="Ordenar por descrição" onclick="pesquisaProduto('z.COMPLDESC')">Descrição</th>
                             <th style="cursor:pointer" title="Ordenar por categoria" onclick="pesquisaProduto('gru.DESCRGRUPOPROD')">Categoria</th>
@@ -71,6 +72,7 @@ function selectCategoriaImport(){
     WHERE z.USOPROD = 'R'   
     AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS) 
     GROUP BY gru.CODGRUPOPROD, gru.DESCRGRUPOPROD , z.USOPROD 
+    ORDER BY gru.DESCRGRUPOPROD
   `
   let dados = getDadosSql(sql,true)
 
@@ -155,7 +157,8 @@ function pesquisaProduto(ordenacao){
         let disabled = ""
         let botaoCls = "btn-outline-primary"
   
-        if(data[i].ATIVO == 'N' || data[i].AD_FORADELINHA == 'S' || data[i].KIT == 'S') {
+        if(data[i].ATIVO == 'N' || data[i].AD_FORADELINHA == 'S') {
+        // if(data[i].ATIVO == 'N' || data[i].AD_FORADELINHA == 'S' || data[i].KIT == 'S') {
           disabled = 'disabled';
           botaoCls = 'btn-outline-secondary';
         } 
@@ -175,6 +178,7 @@ function pesquisaProduto(ordenacao){
         }
   
         tabela.append("<tr>"+
+                        "<td>"+(i+1)+"</td>"+
                         "<td>"+data[i].CODPROD+"</td>"+
                         "<td>"+data[i].DESCRICAO+"</td>"+
                         "<td>"+data[i].CATEGORIA+"</td>"+
@@ -410,7 +414,7 @@ function novoProduto(idproduto, sku, idmarca, name, urlfrendly, produtoidsk){
                         "$": "N"
                     },
                     "ISVISIBLE":{
-                        "$": "N"
+                        "$": "S"
                     },
                     "PAGETITLE" : {
                       "$" : name

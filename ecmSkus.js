@@ -513,7 +513,7 @@ function viewSku(idsku) {
             </div>
         </form>
     `);
-
+      
 
     // incluindo dados
     $("#mCodigoSk").val(sku[0].PRODUTOIDSK);
@@ -636,6 +636,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+1+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},1, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img1" src="${imgs[0].IMG01}" />
                             </div>
                             <div class="card-footer">
@@ -647,6 +650,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+2+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},2, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img2" src="${imgs[0].IMG02}" />
                             </div>
                             <div class="card-footer">
@@ -658,6 +664,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+3+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},3, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img3" src="${imgs[0].IMG03}" />
                             </div>
                             <div class="card-footer">
@@ -671,6 +680,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+4+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},4, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img4" src="${imgs[0].IMG04}" />
                             </div>
                             <div class="card-footer ">
@@ -682,6 +694,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+5+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},5, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img5" src="${imgs[0].IMG05}" />
                             </div>
                             <div class="card-footer">
@@ -693,6 +708,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+6+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},6, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img6" src="${imgs[0].IMG06}" />
                             </div>
                             <div class="card-footer">
@@ -704,6 +722,9 @@ function listFotos(idsku){
                     <div class="col-3">
                         <div class="card">
                             <div class="card-body" style="height: 200px;">
+                                <div style="position:absolute">
+                                   ${imgs[0]['IMG0'+7+'_ENV'] == 'S' ? `<a class="btn btn-danger" onclick="excluirImagemSku(${idsku},7, ${imgs[0].IDIMG})"><i class="bi bi-trash3"></i></a>` : ''}
+                                </div>
                                 <img style="display:block; width:100%;height:100%;" id="img7" src="${imgs[0].IMG07}" />
                             </div>
                             <div class="card-footer">
@@ -802,6 +823,23 @@ function salvarSku(){
     camposMontado.WEIGHTASSEMBLED = dataFormatSankhya($("#pesoMontado").val())
 
     saveRecord(entidade,camposMontado,chave)
+}
+
+function excluirImagemSku(idsku, number, idimg){
+    let entity = 'AD_ECMSKUSIMG'
+
+    let fields = {}
+    fields['IMG0'+number+'_N'] = dataFormatSankhya('')
+    fields['IMG0'+number+'_ENV'] = dataFormatSankhya('')
+    fields['IMG0'+number] = dataFormatSankhya('')
+
+    let key = {
+        "IDSKU": dataFormatSankhya(idsku),
+        "IDIMG": dataFormatSankhya(idimg)
+    }
+
+    saveRecord(entity, fields, key)
+    listFotos(idsku)
 }
 
 // inclusao de sku novo

@@ -101,79 +101,160 @@
 	<!-- Script de API -->
 	<!-- <script language="JavaScript">
 		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
-	</script>
-	<script language="JavaScript">
+	</script>  -->
+	<!-- <script language="JavaScript">
 		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
-	</script> -->
+	</script>  -->
+		<!-- <script language="JavaScript">
+		document.write('<script src="http://10.10.100.28/sankhya/ecommerce/ecmCores.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script>  -->
 
 
 	<!-- Configurando pra rodar em localhost -->
 
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/simeditor/module.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/simeditor/module.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 
 	<!-- Script de hotkeys simeditor-->
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/simeditor/hotkeys.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/simeditor/hotkeys.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 
 	<!-- Script de uploader simeditor -->
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/simeditor/uploader.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/simeditor/uploader.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 
 	<!-- Script de simeditor -->
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/simeditor/simditor.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/simeditor/simditor.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 
 	<!-- Script de MODAL`S -->
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/ecmModals.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/ecmModals.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script de DIALOGOS -->
 	<script language="JavaScript">
-		document.write('<scr' + 'ipt src="http://172.16.62.168/ecommerce/ecmDialogos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<scr' + 'ipt src="http://172.16.62.186/ecommerce/ecmDialogos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Produtos -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmCadastroProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmCadastroProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Skus -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmSkus.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmSkus.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Categorias -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Marcas -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmMarcas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmMarcas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Etiquetas -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmEtiquetas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmEtiquetas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script MetaDados -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmMetadados.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmMetadados.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script Utils -->
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmUtils.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmUtils.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<!-- Script de API -->
 	 <script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script>
 	<script language="JavaScript">
-		document.write('<script src="http://172.16.62.168/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
 	</script> 
+	<script language="JavaScript">
+		document.write('<script src="http://172.16.62.186/ecommerce/ecmCores.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> 
+
+
+<!-- --------------------------------------- IP Local residência----------------------------------------------------- -->
+
+
+
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/simeditor/module.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+
+	<!-- Script de hotkeys simeditor-->
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/simeditor/hotkeys.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+
+	<!-- Script de uploader simeditor -->
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/simeditor/uploader.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+
+	<!-- Script de simeditor -->
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/simeditor/simditor.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+
+	<!-- Script de MODAL`S -->
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/ecmModals.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script de DIALOGOS -->
+	<!-- <script language="JavaScript">
+		document.write('<scr' + 'ipt src="http://192.168.100.44/ecommerce/ecmDialogos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Produtos -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmCadastroProdutos.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Skus -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmSkus.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Categorias -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Marcas -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmMarcas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Etiquetas -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmEtiquetas.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script MetaDados -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmMetadados.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script Utils -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmUtils.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- Script de API -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmApp.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script> -->
+	<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmGrupoCategorias.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script>  -->
+		<!-- <script language="JavaScript">
+		document.write('<script src="http://192.168.100.44/ecommerce/ecmCores.js?versao='+Math.random()+'"><\/scr' + 'ipt>');
+	</script>  -->
+
 
 	<snk:load/>
 </head>

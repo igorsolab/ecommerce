@@ -158,7 +158,7 @@ function exibeCategoria(idcategoria) {
     $('#isenabled').val(categoria[0].ISENABLED);
     $('#url').val(categoria[0].URL);
     $('#idcategoriapai').val(categoria[0].IDCATEGORIAPAI);
-    $("#idcategoriapai").prop('disabled',true);
+    // $("#idcategoriapai").prop('disabled',true);
     $('#pagetitle').val(categoria[0].PAGETITLE);
     $('#alternatetitle').val(categoria[0].ALTERNATETITLE);
     $('#keywords').val(categoria[0].KEYWORDS);

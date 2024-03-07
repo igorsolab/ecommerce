@@ -1,7 +1,7 @@
 // Arquivo de Meta Dados
 
 function gridMetadados(){
-    let sql     = "SELECT * FROM AD_ECMMETADATA"
+    let sql     = "SELECT * FROM AD_ECMMETADATA WHERE ATIVO = 'S'"
     let data    =  getDadosSql(sql, true);
     let dados   = [];
     let tela    = $('#dados');
@@ -60,13 +60,28 @@ function gridMetadados(){
                 tipo = "Logico"
             }
 
-            let botao = `<button type="button" onclick="viewMetadado(${data[i].IDMETA});" class="btn btn-success btn-sm"><i class="fa-regular fa-pen-to-square"></i></button>`;
+            let botao = `
+                <button type="button" 
+                    onclick="viewMetadado(${data[i].IDMETA});" 
+                    class="btn btn-success btn-sm"
+                    title="Editar Metadado">
+                        <i class="fa-regular fa-pen-to-square"></i>        
+                </button>
             
+            
+                <button 
+                    type="button" 
+                    onclick="excluirMetaDado(${data[i].IDMETA});" 
+                    class="btn btn-danger btn-sm"
+                    title="Excluir Metadado">
+                        <i class="bi bi-trash3"></i>
+                </button>`;
             dados.push({"IDMETA"                : data[i].IDMETA, 
                         "PROPERTYMETADATAID"    : data[i].PROPERTYMETADATAID,
                         "DISPLAYNAME"           : data[i].DISPLAYNAME,
                         "INPUTTYPEID"           : tipo,
-                        "BOTAO"                 : botao });
+                        "BOTAO"           : botao
+                });
         
         }
         
@@ -75,7 +90,17 @@ function gridMetadados(){
         });
 
 }
-
+function excluirMetaDado(id) {
+    let entity = 'AD_ECMMETADATA';
+    let key = {
+        "IDMETA"   : dataFormatSankhya(id)
+    }
+    let fields={};
+    fields.ATIVO        = dataFormatSankhya('N')
+    saveRecord(entity,fields,key);
+    menu()
+    gridMetadados()
+}
 function novoMetadados(id){
     let tela = $('#bodyDetailXl');
     tela.empty()
@@ -350,13 +375,21 @@ function viewTabelaOpt(idmeta){
 
     if(idmeta != '' && idmeta != undefined) {
         
-        let sql     = `SELECT * FROM AD_ECMMETADATAOPTS WHERE IDMETA = ${idmeta}`
+        let sql     = `SELECT * FROM AD_ECMMETADATAOPTS WHERE IDMETA = ${idmeta} AND ATIVO = 'S'`
         let data    = getDadosSql(sql,true) 
         let dados   = [];
 
         for(let i = 0; i < data.length; i++){
 
-            let botao = `<button type="button" onclick="editaOpt(${data[i].IDMETA},${data[i].IDOPT});" class="btn btn-success btn-sm"><i class="fa-regular fa-pen-to-square"></i></button>`;
+            let botao = `
+                <button type="button" 
+                    onclick="editaOpt(${data[i].IDMETA},${data[i].IDOPT});" 
+                    class="btn btn-success btn-sm"><i class="fa-regular fa-pen-to-square"></i>
+                </button>
+                <button type="button" 
+                    onclick="excluirOptMetadado(${data[i].IDMETA},${data[i].IDOPT});" 
+                    class="btn btn-danger btn-sm"><i class="bi bi-trash3"></i>
+                </button>`;
             
             dados.push({"IDOPT"             : data[i].IDOPT, 
                         "METADATAOPTIONID"  : data[i].METADATAOPTIONID,
@@ -372,6 +405,17 @@ function viewTabelaOpt(idmeta){
     }
 }
 
+function excluirOptMetadado(idmetadado, idopt){
+    let entity = 'AD_ECMMETADATAOPTS';
+    let key = {
+        "IDMETA"    : dataFormatSankhya(idmetadado),
+        "IDOPT"     : dataFormatSankhya(idopt)
+    }
+    let fields={};
+    fields.ATIVO        = dataFormatSankhya('N')
+    saveRecord(entity,fields,key);
+    viewTabelaOpt(idmetadado)
+}
 // exibe dados do Metadados
 function viewMetadado(id) {
     let sql     = `SELECT * FROM AD_ECMMETADATA WHERE IDMETA = ${id}`
@@ -419,6 +463,7 @@ function gravaMetadados() {
     fields.USEFORSORT           = dataFormatSankhya("78");
     fields.DISPLAYTYPE          = dataFormatSankhya("1");
     fields.ENTITYMETADATAID     = dataFormatSankhya("8");
+    fields.ATIVO                = dataFormatSankhya("S");
 
     if(idmeta != "" && idmeta != undefined) {
         key =   {

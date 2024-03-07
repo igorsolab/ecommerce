@@ -97,9 +97,15 @@ function menu() {
   let qtdEtq = getDadosSql(sql);
   sql = `SELECT COUNT(*) FROM AD_ECMMARCAS`
   let qtdMarcas = getDadosSql(sql);
-  sql = `SELECT COUNT(*) FROM AD_ECMMETADATA`
+  sql = `SELECT COUNT(*) FROM AD_ECMMETADATA WHERE ATIVO = 'S'`
   let qtdMetadados = getDadosSql(sql);
-
+  sql = `SELECT COUNT(*) FROM TGFPRO z INNER JOIN v_precoecommerce vp ON vp.codproduto = z.CODPROD INNER JOIN TGFGRU gru ON gru.CODGRUPOPROD = z.CODGRUPOPROD 
+          WHERE z.USOPROD = 'R' 
+          AND z.ATIVO = 'S'
+          AND z.AD_FORADELINHA = 'N'
+          AND vp.estoque_disponivel > 0
+          AND z.CODPROD NOT IN (SELECT PRODUTOIDSK FROM AD_ECMSKUS)`
+  let qtdProdutosCadastrar = getDadosSql(sql)
   let html =`
         <li class="nav-item py-2 py-sm-0">
             <a href="#" class="nav-link text-white" aria-current="page"> 
@@ -143,7 +149,12 @@ function menu() {
       </li>
       <li class="nav-item py-2 py-sm-0">
         <a href="#" onclick="modalPesquisaProduto();" class="nav-link text-white" aria-current="page"> 
-        <i class="bi bi-plus-circle-fill"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Cadastro de Produtos</span>
+        <i class="bi bi-plus-circle-fill"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Cadastro de Produtos</span><span class="badge fs-9 ms-1 bg-info">${qtdProdutosCadastrar[0][0]}</span> 
+        </a>
+      </li>
+      <li class="nav-item py-2 py-sm-0">
+        <a href="#" onclick="mostraPaleta();" class="nav-link text-white" aria-current="page"> 
+          <i class="bi bi-palette"></i> <span class=" fs-7 ms-1 d-none d-sm-inline">Cadastro de Cores</span
         </a>
       </li>
   `;
